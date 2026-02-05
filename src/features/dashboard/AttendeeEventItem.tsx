@@ -2,15 +2,12 @@ import { memo } from 'react';
 import { Calendar, MapPin, QrCode, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import type { IRsvp } from '../../types/rsvp.types';
+import { UI_TEXT } from '../../constants/text.constants';
 
 interface AttendeeEventItemProps {
     rsvp: IRsvp;
     onNavigate: (path: string) => void;
     onTicket: (ticket: IRsvp) => void;
-    // We don't really need onShare since it opens a URL, but we can memoize it if needed. 
-    // Actually the share URL data depends on event details.
-    // Let's just keep share logic inside the item or passed as handler.
-    // Since whatsapp URL is constructed, let's keep it here.
 }
 
 export const AttendeeEventItem = memo(({ rsvp, onNavigate, onTicket }: AttendeeEventItemProps) => {
@@ -19,7 +16,7 @@ export const AttendeeEventItem = memo(({ rsvp, onNavigate, onTicket }: AttendeeE
     // Type guard: ensure event is an object (populated) and has _id
     if (!event || typeof event === 'string' || !('_id' in event)) return null;
 
-    const shareText = `Join me at ${event.title}! ${window.location.origin}/events/${event._id}`;
+    const shareText = `${UI_TEXT.EVENT_ITEM_JOIN_ME} ${event.title}! ${window.location.origin}/events/${event._id}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
     return (
@@ -44,7 +41,7 @@ export const AttendeeEventItem = memo(({ rsvp, onNavigate, onTicket }: AttendeeE
                     </div>
                     <div className="text-sm text-textSecondary flex items-center gap-2 mt-1">
                         <MapPin className="w-4 h-4 shrink-0" />
-                        <span className="truncate">{event.location?.address || 'Online'}</span>
+                        <span className="truncate">{event.location?.address || UI_TEXT.EVENT_ITEM_ONLINE}</span>
                     </div>
                 </div>
             </div>
@@ -69,7 +66,7 @@ export const AttendeeEventItem = memo(({ rsvp, onNavigate, onTicket }: AttendeeE
                             }} 
                             className="text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors flex items-center gap-1"
                             >
-                                <QrCode className="w-3 h-3" /> Ticket
+                                <QrCode className="w-3 h-3" /> {UI_TEXT.EVENT_ITEM_TICKET}
                             </button>
                     )}
                     <a 
@@ -79,7 +76,7 @@ export const AttendeeEventItem = memo(({ rsvp, onNavigate, onTicket }: AttendeeE
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs font-bold text-green-600 px-3 py-1.5 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-1"
                     >
-                        <MessageCircle className="w-3 h-3" /> Share
+                        <MessageCircle className="w-3 h-3" /> {UI_TEXT.EVENT_ITEM_SHARE}
                     </a>
                 </div>
             </div>

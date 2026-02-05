@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
-import { uploadApi } from '../services/api/upload.api';
 import Button from './Button';
 import { cn } from '../utils/cn';
+import { UI_TEXT } from '../constants/text.constants';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 interface ImageUploadProps {
     onUpload: (url: string) => void;
@@ -11,40 +11,7 @@ interface ImageUploadProps {
 }
 
 const ImageUpload = ({ onUpload, defaultImage, className }: ImageUploadProps) => {
-    const [preview, setPreview] = useState<string | null>(defaultImage || null);
-    const [isUploading, setIsUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        // Preview immediate
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-
-        // Upload
-        try {
-            setIsUploading(true);
-            const data = await uploadApi.uploadImage(file);
-            onUpload(data.url);
-        } catch (error) {
-            console.error('Upload failed', error);
-            alert('Failed to upload image');
-            setPreview(null); // revert on failure
-        } finally {
-            setIsUploading(false);
-        }
-    };
-
-    const handleRemove = () => {
-        setPreview(null);
-        onUpload('');
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    };
+    const { preview, isUploading, fileInputRef, handleFileChange, handleRemove } = useImageUpload(onUpload, defaultImage);
 
     return (
         <div className={cn("relative w-full aspect-video bg-gray-50 border-2 border-dashed border-border rounded-xl flex items-center justify-center overflow-hidden hover:bg-gray-100 transition-colors", className)}>
@@ -60,11 +27,11 @@ const ImageUpload = ({ onUpload, defaultImage, className }: ImageUploadProps) =>
             {isUploading ? (
                 <div className="flex flex-col items-center text-primary">
                     <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                    <span className="text-sm font-medium">Uploading...</span>
+                    <span className="text-sm font-medium">{UI_TEXT.UPLOADING_LABEL}</span>
                 </div>
             ) : preview ? (
                 <div className="relative w-full h-full">
-                    <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={preview} alt={UI_TEXT.UPLOAD_PREVIEW_ALT} className="w-full h-full object-cover" />
                     <div className="absolute top-2 right-2 z-20">
                          <Button 
                             type="button" 
@@ -82,8 +49,8 @@ const ImageUpload = ({ onUpload, defaultImage, className }: ImageUploadProps) =>
             ) : (
                 <div className="flex flex-col items-center text-textSecondary pointer-events-none">
                     <Upload className="w-8 h-8 mb-2" />
-                    <span className="text-sm font-medium">Click to upload cover image</span>
-                    <span className="text-xs text-textSecondary/70 mt-1">JPG, PNG up to 5MB</span>
+                    <span className="text-sm font-medium">{UI_TEXT.CLICK_TO_UPLOAD}</span>
+                    <span className="text-xs text-textSecondary/70 mt-1">{UI_TEXT.UPLOAD_HINT}</span>
                 </div>
             )}
         </div>

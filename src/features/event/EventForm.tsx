@@ -1,23 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useForm, useWatch, type FieldError } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import * as Yup from 'yup';
-import { eventSchema } from '../../validators/event.schema';
-import { eventApi } from '../../services/api/event.api';
-import { EventCategory, EventVisibility, type IEvent } from '../../types/event.types';
-import { type ICommunity } from '../../types/community.types';
-import { ROUTES } from '../../constants/routes';
+import { useState } from 'react';
+import type { SubmitHandler } from 'react-hook-form';
+import type { EventFormData } from '../../validators/event.schema';
+import type { IEvent } from '../../types/event.types';
+import { EventCategory, EventVisibility } from '../../types/event.types';
 import Input from '../../components/Input';
 import Textarea from '../../components/Textarea';
 import Select from '../../components/Select';
 import Button from '../../components/Button';
 import ImageUpload from '../../components/ImageUpload';
 import LocationPicker from '../../components/LocationPicker';
-import { AxiosError } from 'axios';
-
-type EventFormData = Yup.InferType<typeof eventSchema>;
+import { UI_TEXT, BUTTON_TEXT } from '../../constants/text.constants';
+import { useEventForm } from '../../hooks/event/useEventForm';
+import { useGeocoding } from '../../hooks/useGeocoding';
+import { toast } from 'react-hot-toast';
 
 interface EventFormProps {
     initialData?: IEvent;
@@ -26,169 +21,90 @@ interface EventFormProps {
 }
 
 const EventForm = ({ initialData, isEditing = false, initialCommunityId }: EventFormProps) => {
-    const navigate = useNavigate();
-    const [imageUrl, setImageUrl] = useState<string>(initialData?.photos?.[0] || '');
+    const {
+        form,
+        imageUrl,
+        setImageUrl,
+        communities,
+        visibility,
+        watchCommunityId,
+        isRecurring,
+        isCommunityOnly,
+        latitude,
+        longitude,
+        getError,
+        onSubmit
+    } = useEventForm({ initialData, isEditing, initialCommunityId });
 
-    useEffect(() => {
-        if (initialData?.photos?.[0]) {
-            setImageUrl(initialData.photos[0]);
-        }
-    }, [initialData]);
-
-    const [communities, setCommunities] = useState<ICommunity[]>([]);
     const {
         register,
-        control,
-        handleSubmit,
         setValue,
+        handleSubmit,
+        getValues,
         formState: { errors, isSubmitting },
-    } = useForm<EventFormData>({
-        resolver: yupResolver(eventSchema) as any, // Cast resolver due to RHF/Yup version mismatch often causing type issues, but safer than ts-ignore
-        defaultValues: {
-            title: initialData?.title || '',
-            description: initialData?.description || '',
-            category: (initialData?.category as EventCategory) || EventCategory.MEETUP,
-            visibility: (initialData?.visibility as EventVisibility) || (initialCommunityId ? EventVisibility.COMMUNITY_ONLY : EventVisibility.PUBLIC),
-            startDateTime: initialData?.startDateTime || '',
-            endDateTime: initialData?.endDateTime || '',
-            capacity: initialData?.capacity || 50,
-            isRecurring: !!initialData?.recurringRule,
-            communityId: initialData?.community 
-                ? (typeof initialData.community === 'string' ? initialData.community : (initialData.community as any)._id) 
-                : (initialCommunityId || ''),
-            location: {
-                address: initialData?.location?.address || '',
-                latitude: initialData?.location?.coordinates?.[1] || 51.505,
-                longitude: initialData?.location?.coordinates?.[0] || -0.09
-            },
-            recurringRule: initialData?.recurringRule ? {
-                frequency: initialData.recurringRule.frequency,
-                interval: initialData.recurringRule.interval,
-                endDate: initialData.recurringRule.endDate
-            } : undefined
-        },
-    });
+    } = form;
 
-    const visibility = useWatch({ control, name: 'visibility' });
-    const watchCommunityId = useWatch({ control, name: 'communityId' });
-    const isCommunityOnly = visibility === EventVisibility.COMMUNITY_ONLY;
-    const isRecurring = useWatch({ control, name: 'isRecurring' });
+    const { searchAddress } = useGeocoding();
+    const [mapPosition, setMapPosition] = useState<{lat: number, lng: number} | null>(
+        latitude && longitude ? { lat: Number(latitude), lng: Number(longitude) } : null
+    );
 
-    // Fetch user's communities to populate dropdown
-    useEffect(() => {
-        const fetchCommunities = async () => {
-             try {
-                // Determine if we should show ALL communities user is member of, 
-                // or only ones where they are admin? 
-                // For now, let's assume organizers can post events to any community they are part of 
-                // (or we can filter for 'admin' role if needed later).
-                // Using the specific 'my' endpoint we just fixed.
-                const { communityApi } = await import('../../services/api/community.api');
-                const myCommunities = await communityApi.getAll({ memberId: 'me' });
-                setCommunities(myCommunities);
-             } catch (err) {
-                 console.error('Failed to load communities', err);
-             }
-        };
-        fetchCommunities();
-    }, []);
-
-    // Helper for safe error access
-    const getError = (path: string): FieldError | undefined => {
-        const parts = path.split('.');
-        let current: any = errors;
-        for (const part of parts) {
-            current = current?.[part];
+    const handleAddressBlur = async () => {
+        const address = getValues('location.address');
+        if (address) {
+            const coords = await searchAddress(address);
+            if (coords) {
+                setValue('location.latitude', coords.lat);
+                setValue('location.longitude', coords.lng);
+                setMapPosition(coords);
+                toast.success('Location found on map');
+            }
         }
-        return current as FieldError | undefined;
     };
 
-    const onSubmit = async (data: EventFormData) => {
-        try {
-            // Flatten payload for backend
-            
-            // Explicitly cast or construct to match backend expectation
-            // Data is strictly typed from form, but we need to massage it to IEvent payload
-            
-            // Create a payload that extends IEvent with form-specific fields like inviteEmails
-            const payload = {
-                title: data.title,
-                description: data.description,
-                category: data.category as EventCategory,
-                visibility: data.visibility as EventVisibility,
-                startDateTime: data.startDateTime,
-                endDateTime: data.endDateTime,
-                capacity: data.capacity,
-                location: {
-                    address: data.location?.address || '',
-                    type: 'Point' as const,
-                    coordinates: [
-                         Number(data.location?.longitude || '-0.09'),
-                         Number(data.location?.latitude || '51.505')
-                    ] as [number, number]
-                },
-                photos: imageUrl ? [imageUrl] : [],
-                recurringRule: data.isRecurring && data.recurringRule ? {
-                    frequency: (data.recurringRule.frequency || 'WEEKLY') as 'DAILY' | 'WEEKLY' | 'MONTHLY', // Default or handle undefined
-                    interval: data.recurringRule.interval || 1,
-                    endDate: data.recurringRule.endDate
-                } : undefined,
-                community: data.communityId || undefined, 
-                inviteEmails: data.inviteEmails ? data.inviteEmails.split(',').map((e: string) => e.trim()).filter((e: string) => e) : [],
-            };
-            
-            if (isEditing && initialData?._id) {
-                await eventApi.update(initialData._id, payload);
-                toast.success('Event updated successfully!');
-            } else {
-                await eventApi.create(payload); 
-                toast.success('Event created successfully!');
-            }
-            navigate(ROUTES.DASHBOARD);
-        } catch (error: unknown) {
-            console.error('Event save error:', error);
-            if (error instanceof AxiosError) {
-                const message = error.response?.data?.message || 'Failed to save event.';
-                toast.error(message);
-            } else {
-                toast.error('An unexpected error occurred');
-            }
-        }
+    const handleLocationSelect = async (pos: { lat: number; lng: number }) => {
+        setValue('location.latitude', pos.lat);
+        setValue('location.longitude', pos.lng);
+        setMapPosition(pos); // Sync internal state
+        
+        // Optional: Reverse geocode to fill address if empty or user wants it
+        // For now, let's not overwrite unless we want that specific behavior. 
+        // User said "user can also select himself", implying manual override.
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto bg-surface p-8 rounded-xl border border-border shadow-sm mb-12">
+        <form onSubmit={handleSubmit(onSubmit as SubmitHandler<EventFormData>)} className="space-y-6 max-w-2xl mx-auto bg-surface p-8 rounded-xl border border-border shadow-sm mb-12">
             <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-text">{isEditing ? 'Edit Event' : 'Create New Event'}</h2>
-                <p className="text-textSecondary text-sm">{isEditing ? 'Update your event details below.' : 'Fill in the details below to host your event.'}</p>
+                <h2 className="text-2xl font-bold text-text">{isEditing ? UI_TEXT.EDIT_EVENT_TITLE : UI_TEXT.CREATE_EVENT_TITLE}</h2>
+                <p className="text-textSecondary text-sm">{isEditing ? UI_TEXT.EDIT_EVENT_SUBTITLE : UI_TEXT.CREATE_EVENT_SUBTITLE}</p>
             </div>
 
             <Input
-                label="Event Title"
+                label={UI_TEXT.EVENT_TITLE_LABEL}
                 name="title"
                 type="text"
                 register={register}
                 error={errors.title}
-                placeholder="e.g., Annual Block Party"
+                placeholder={UI_TEXT.EVENT_TITLE_PLACEHOLDER}
             />
 
             <div className="mb-6">
-                 <label className="block text-sm font-medium text-textSecondary mb-2">Event Cover Image</label>
+                 <label className="block text-sm font-medium text-textSecondary mb-2">{UI_TEXT.COVER_IMAGE_LABEL}</label>
                  <ImageUpload onUpload={setImageUrl} defaultImage={imageUrl} />
             </div>
 
             <Textarea
-                label="Description"
+                label={UI_TEXT.DESCRIPTION_LABEL}
                 name="description"
                 register={register}
                 error={errors.description}
-                placeholder="Describe your event..."
+                placeholder={UI_TEXT.DESCRIPTION_PLACEHOLDER}
                 rows={4}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Select
-                    label="Category"
+                    label={UI_TEXT.CATEGORY_LABEL}
                     name="category"
                     register={register}
                     error={errors.category}
@@ -198,14 +114,14 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                 {/* Visibility & Community Selection */}
                 <div className="space-y-4 md:col-span-2">
                      <Select
-                        label="Visibility"
+                        label={UI_TEXT.VISIBILITY_LABEL}
                         name="visibility"
                         register={register}
                         error={errors.visibility}
                         options={[
-                            { value: EventVisibility.PUBLIC, label: 'Public (Everyone)' },
-                            { value: EventVisibility.COMMUNITY_ONLY, label: 'Community Members Only' },
-                            { value: EventVisibility.PRIVATE_INVITE, label: 'Private (Invite Only)' },
+                            { value: EventVisibility.PUBLIC, label: UI_TEXT.PUBLIC_OPTION },
+                            { value: EventVisibility.COMMUNITY_ONLY, label: UI_TEXT.COMMUNITY_ONLY_OPTION },
+                            { value: EventVisibility.PRIVATE_INVITE, label: UI_TEXT.PRIVATE_OPTION },
                         ]}
                     />
 
@@ -213,13 +129,13 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                     {visibility === EventVisibility.COMMUNITY_ONLY && communities.length > 0 && (
                         <div className="form-control w-full">
                             <label className="label block text-sm font-medium text-textSecondary mb-2">
-                                <span className="label-text">Host Community</span>
+                                <span className="label-text">{UI_TEXT.HOST_COMMUNITY_LABEL}</span>
                             </label>
                             <select 
                                 {...register('communityId')}
                                 className="select select-bordered w-full p-3 rounded-xl border border-border bg-white focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                             >
-                                <option value="">Select a Community</option>
+                                <option value="">{UI_TEXT.SELECT_COMMUNITY_PLACEHOLDER}</option>
                                 {communities.map(c => (
                                     <option key={c._id} value={c._id}>{c.name}</option>
                                 ))}
@@ -233,16 +149,16 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                          <div className="form-control w-full"> 
                              {/* Always allow inviting, but enforce for PRIVATE */}
                              <Textarea
-                                label={visibility === EventVisibility.PRIVATE_INVITE ? "Invitee Emails (Required)" : "Invite People (Optional)"}
+                                label={visibility === EventVisibility.PRIVATE_INVITE ? UI_TEXT.INVITE_EMAILS_LABEL_REQUIRED : UI_TEXT.INVITE_EMAILS_LABEL_OPTIONAL}
                                 name="inviteEmails"
                                 register={register}
                                 error={errors.inviteEmails}
-                                placeholder="Enter email addresses separated by commas (e.g., alice@example.com, bob@example.com)"
+                                placeholder={UI_TEXT.INVITE_EMAILS_PLACEHOLDER}
                                 rows={3}
                             />
                             {visibility === EventVisibility.PRIVATE_INVITE && (
                                 <p className="text-xs text-textSecondary mt-1">
-                                    For private events, only people with these email addresses will be able to see and join the event.
+                                    {UI_TEXT.PRIVATE_EVENT_NOTE}
                                 </p>
                             )}
                          </div>
@@ -254,13 +170,13 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                 {isCommunityOnly && !watchCommunityId && (
                      <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-100 flex items-start gap-2">
                         <span>⚠️</span>
-                        <span>You selected "Community Members Only". Please select a community to associate this event with, or it will not be visible to the right people.</span>
+                        <span>{UI_TEXT.COMMUNITY_WARNING}</span>
                      </div>
                 )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                    label="Start Date & Time"
+                    label={UI_TEXT.START_DATE_LABEL}
                     name="startDateTime"
                     type="datetime-local"
                     register={register}
@@ -268,7 +184,7 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                 />
 
                 <Input
-                    label="End Date & Time"
+                    label={UI_TEXT.END_DATE_LABEL}
                     name="endDateTime"
                     type="datetime-local"
                     register={register}
@@ -277,41 +193,41 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
             </div>
 
             <div className="space-y-4 pt-4 border-t border-border">
-                <h3 className="font-semibold text-lg">Location Details</h3>
+                <h3 className="font-semibold text-lg">{UI_TEXT.LOCATION_DETAILS_TITLE}</h3>
                 
                 <Input
-                    label="Venue Address"
+                    label={UI_TEXT.VENUE_ADDRESS_LABEL}
                     name="location.address"
                     type="text"
                     register={register}
                     error={errors.location?.address}
-                    placeholder="123 Main St, City"
+                    placeholder={UI_TEXT.VENUE_ADDRESS_PLACEHOLDER}
+                    onBlur={handleAddressBlur}
                 />
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-textSecondary">Pick Location on Map</label>
+                    <label className="block text-sm font-medium text-textSecondary">{UI_TEXT.PICK_LOCATION_LABEL}</label>
                     <LocationPicker 
-                        onChange={(pos) => {
-                            setValue('location.latitude', pos.lat);
-                            setValue('location.longitude', pos.lng);
-                        }}
+                        onChange={handleLocationSelect}
+                        forcePosition={mapPosition}
+                        initialLocation={mapPosition || undefined}
                     />
                     <div className="grid grid-cols-2 gap-4 mt-2">
                         <div className="text-[10px] text-textSecondary uppercase tracking-wider">
-                            Lat: <span className="font-mono">{useWatch({ control, name: 'location.latitude' }) || '51.505'}</span>
+                            Lat: <span className="font-mono">{latitude || '51.505'}</span>
                         </div>
                         <div className="text-[10px] text-textSecondary uppercase tracking-wider">
-                            Lng: <span className="font-mono">{useWatch({ control, name: 'location.longitude' }) || '-0.09'}</span>
+                            Lng: <span className="font-mono">{longitude || '-0.09'}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className="pt-4 border-t border-border space-y-4">
-                <h3 className="font-semibold text-lg">Additional Settings</h3>
+                <h3 className="font-semibold text-lg">{UI_TEXT.ADDITIONAL_SETTINGS_TITLE}</h3>
                 
                 <Input
-                    label="Capacity"
+                    label={UI_TEXT.CAPACITY_LABEL}
                     name="capacity"
                     type="number"
                     register={register}
@@ -326,25 +242,25 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                         {...register('isRecurring')}
                         className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                      />
-                     <label htmlFor="isRecurring" className="text-sm font-medium text-text">This is a recurring event</label>
+                     <label htmlFor="isRecurring" className="text-sm font-medium text-text">{UI_TEXT.RECURRING_EVENT_LABEL}</label>
                 </div>
 
                 {isRecurring && (
                     <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Select
-                                label="Frequency"
+                                label={UI_TEXT.FREQUENCY_LABEL}
                                 name="recurringRule.frequency"
                                 register={register}
                                 error={getError('recurringRule.frequency')}
                                 options={[
-                                    { value: 'DAILY', label: 'Daily' },
-                                    { value: 'WEEKLY', label: 'Weekly' },
-                                    { value: 'MONTHLY', label: 'Monthly' },
+                                    { value: 'DAILY', label: UI_TEXT.FREQUENCY_DAILY },
+                                    { value: 'WEEKLY', label: UI_TEXT.FREQUENCY_WEEKLY },
+                                    { value: 'MONTHLY', label: UI_TEXT.FREQUENCY_MONTHLY },
                                 ]}
                             />
                              <Input
-                                label="Interval"
+                                label={UI_TEXT.INTERVAL_LABEL}
                                 name="recurringRule.interval"
                                 type="number"
                                 register={register}
@@ -353,7 +269,7 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
                             />
                         </div>
                          <Input
-                            label="End Date"
+                            label={UI_TEXT.END_DATE_RECURRENCE_LABEL}
                             name="recurringRule.endDate"
                             type="date"
                             register={register}
@@ -364,7 +280,7 @@ const EventForm = ({ initialData, isEditing = false, initialCommunityId }: Event
             </div>
 
             <Button type="submit" className="w-full py-4 text-lg" isLoading={isSubmitting}>
-                {isEditing ? 'Save Changes' : 'Create Event'}
+                {isEditing ? BUTTON_TEXT.SAVE_CHANGES : BUTTON_TEXT.CREATE_EVENT}
             </Button>
         </form>
     );

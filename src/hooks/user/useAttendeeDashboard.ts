@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './useAuth';
-import { userApi } from '../services/api/user.api';
-import { rsvpApi } from '../services/api/rsvp.api';
+import { useAuth } from '../useAuth';
+import { userApi } from '../../services/api/user.api';
+import { rsvpApi } from '../../services/api/rsvp.api';
 import { toast } from 'react-hot-toast';
+import { AxiosError } from 'axios';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../store/authSlice';
-import { type IRsvp, RsvpStatus } from '../types/rsvp.types';
+import { updateUser } from '../../store/authSlice';
+import { type IRsvp, RsvpStatus } from '../../types/rsvp.types';
+import { ERROR_MESSAGES } from '../../constants/text.constants';
 
 export const useAttendeeDashboard = () => {
     const { user } = useAuth();
@@ -35,15 +37,19 @@ export const useAttendeeDashboard = () => {
             await userApi.requestUpgrade();
             dispatch(updateUser({ upgradeStatus: 'PENDING' }));
             toast.success('Upgrade request submitted! An admin will review it shortly.');
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to submit request');
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message || 'Failed to submit request');
+            } else {
+                 toast.error(ERROR_MESSAGES.GENERIC_ERROR);
+            }
         } finally {
             setIsLoading(false);
         }
     }, [dispatch]);
 
-    const upcoming = (myRsvps || []).filter((r: any) => 
-        r && r.status === RsvpStatus.GOING || r && r.status === RsvpStatus.MAYBE
+    const upcoming = myRsvps.filter(r => 
+        r.status === RsvpStatus.GOING || r.status === RsvpStatus.MAYBE
     );
 
     return {

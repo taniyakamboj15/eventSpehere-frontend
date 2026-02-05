@@ -4,6 +4,7 @@ import { ROUTES } from '../constants/routes';
 import Button from '../components/Button';
 import { Calendar, Users, Sparkles, Menu, X, LogOut, Shield, Search } from 'lucide-react';
 import React from 'react';
+import { UI_TEXT } from '../constants/text.constants';
 
 const DashboardLayout = () => {
   const { isAuthenticated, isLoading, signOut, user } = useAuth();
@@ -30,7 +31,7 @@ const DashboardLayout = () => {
         onClick={() => { navigate(ROUTES.DASHBOARD); setIsMobileMenuOpen(false); }}
       >
         <Calendar size={18} />
-        Joined Events
+        {UI_TEXT.SIDEBAR_JOINED}
       </Button>
       <Button 
         variant="ghost" 
@@ -38,14 +39,14 @@ const DashboardLayout = () => {
         onClick={() => { navigate(ROUTES.EVENTS); setIsMobileMenuOpen(false); }}
       >
         <Search size={18} />
-        Discover Events
+        {UI_TEXT.SIDEBAR_DISCOVER}
       </Button>
 
       {/* Organizer Only */}
       {(user?.role === 'ORGANIZER' || user?.role === 'ADMIN') && (
         <>
           <div className="pt-4 pb-2 px-4">
-            <span className="text-xs font-semibold text-textSecondary uppercase tracking-wider">Management</span>
+            <span className="text-xs font-semibold text-textSecondary uppercase tracking-wider">{UI_TEXT.SIDEBAR_MANAGEMENT}</span>
           </div>
           <Button 
             variant="ghost" 
@@ -53,7 +54,7 @@ const DashboardLayout = () => {
             onClick={() => { navigate(ROUTES.DASHBOARD); setIsMobileMenuOpen(false); }}
           >
             <Users size={18} />
-            My Events
+            {UI_TEXT.SIDEBAR_MY_EVENTS}
           </Button>
           <Button 
             variant="ghost" 
@@ -61,7 +62,7 @@ const DashboardLayout = () => {
             onClick={() => { navigate(ROUTES.CREATE_EVENT); setIsMobileMenuOpen(false); }}
           >
             <Sparkles size={18} />
-            Create Event
+            {UI_TEXT.SIDEBAR_CREATE_EVENT}
           </Button>
         </>
       )}
@@ -75,7 +76,7 @@ const DashboardLayout = () => {
             onClick={() => { setIsMobileMenuOpen(false); }}
           >
             <Shield size={18} />
-            System Admin
+            {UI_TEXT.SIDEBAR_ADMIN}
           </Button>
         </>
       )}
@@ -86,7 +87,7 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Mobile Header */}
       <header className="md:hidden bg-surface border-b border-border p-4 flex items-center justify-between sticky top-0 z-40">
-        <span className="font-bold text-primary">EventSphere</span>
+        <span className="font-bold text-primary">{UI_TEXT.BRAND_NAME}</span>
         <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </Button>
@@ -102,7 +103,7 @@ const DashboardLayout = () => {
             <div className="pt-4 border-t border-border mt-auto pb-4">
               <Button variant="danger" size="sm" className="w-full justify-start gap-3" onClick={signOut}>
                 <LogOut size={18} />
-                Sign Out
+                {UI_TEXT.NAV_SIGN_OUT}
               </Button>
             </div>
           </div>
@@ -112,7 +113,7 @@ const DashboardLayout = () => {
       {/* Desktop Sidebar */}
       <aside className="w-64 bg-surface border-r border-border p-4 hidden md:flex flex-col sticky top-0 h-screen">
         <h2 className="text-xl font-bold text-primary mb-8 px-2">
-          {user?.role === 'ORGANIZER' ? 'Organizer' : user?.role === 'ADMIN' ? 'Admin' : 'Dashboard'}
+          {user?.role === 'ORGANIZER' ? UI_TEXT.ROLE_ORGANIZER : user?.role === 'ADMIN' ? UI_TEXT.ROLE_ADMIN : UI_TEXT.ROLE_DASHBOARD}
         </h2>
         
         <nav className="flex-1 space-y-1">
@@ -122,7 +123,7 @@ const DashboardLayout = () => {
         <div className="pt-4 border-t border-border mt-4">
           <Button variant="ghost" size="sm" className="w-full justify-start gap-3 text-error hover:bg-red-50" onClick={signOut}>
             <LogOut size={18} />
-            Sign Out
+            {UI_TEXT.NAV_SIGN_OUT}
           </Button>
         </div>
       </aside>
@@ -132,13 +133,13 @@ const DashboardLayout = () => {
         {/* Desktop Header */}
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-surface border-b border-border">
             <div>
-                <h1 className="text-xl font-bold text-text">Welcome back, {user?.name?.split(' ')[0]}!</h1>
-                <p className="text-sm text-textSecondary">Here's what's happening with your events.</p>
+                <h1 className="text-xl font-bold text-text">{UI_TEXT.DASHBOARD_WELCOME}, {user?.name?.split(' ')[0]}!</h1>
+                <p className="text-sm text-textSecondary">{UI_TEXT.DASHBOARD_SUBTITLE}</p>
             </div>
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.HOME)}>
                     <Search className="w-4 h-4 mr-2" />
-                    Browse Events
+                    {UI_TEXT.BROWSE_EVENTS}
                 </Button>
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                     {user?.name?.charAt(0).toUpperCase()}

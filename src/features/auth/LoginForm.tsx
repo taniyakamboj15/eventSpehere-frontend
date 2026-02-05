@@ -1,61 +1,13 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, useNavigate } from 'react-router-dom';
-import { loginSchema } from '../../validators/auth.schema';
-import { authApi, type LoginDTO } from '../../services/api/auth.api';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../store/authSlice';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { AxiosError } from 'axios';
-
-import toast from 'react-hot-toast';
+import { useLogin } from '../../hooks/auth/useLogin';
+import { UI_TEXT } from '../../constants/text.constants';
 
 const LoginForm = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [serverError, setServerError] = useState<string | null>(null);
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginDTO>({
-    resolver: yupResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginDTO) => {
-    try {
-      setServerError(null);
-      const response = await authApi.login(data);
-      
-      toast.success('Logged in successfully!');
-                if (response) {
-                    dispatch(setCredentials({
-                        user: response.user,
-                        accessToken: response.accessToken,
-                    }));
-                }
-
-      navigate(ROUTES.DASHBOARD);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const message = error.response?.data?.message || 'Login failed';
-        setServerError(message);
-        toast.error(message);
-
-        // If not verified, we can append a hint or redirect
-        if (error.response?.status === 403 && message.toLowerCase().includes('verify')) {
-            navigate(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(data.email)}`);
-        }
-      } else {
-        setServerError('An unexpected error occurred');
-        toast.error('An unexpected error occurred');
-      }
-    }
-  };
+  const { form, serverError, onSubmit } = useLogin();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -66,21 +18,21 @@ const LoginForm = () => {
       )}
       
       <Input
-        label="Email"
+        label={UI_TEXT.AUTH_EMAIL_LABEL}
         name="email"
         type="email"
         register={register}
         error={errors.email}
-        placeholder="you@example.com"
+        placeholder={UI_TEXT.AUTH_EMAIL_PLACEHOLDER}
       />
       
       <Input
-        label="Password"
+        label={UI_TEXT.AUTH_PASSWORD_LABEL}
         name="password"
         type="password"
         register={register}
         error={errors.password}
-        placeholder="••••••••"
+        placeholder={UI_TEXT.AUTH_PASSWORD_PLACEHOLDER}
       />
       
       <Button
@@ -88,13 +40,13 @@ const LoginForm = () => {
         className="w-full"
         isLoading={isSubmitting}
       >
-        Sign In
+        {UI_TEXT.AUTH_SIGN_IN_BUTTON}
       </Button>
       
       <div className="text-center text-sm text-textSecondary mt-4">
-        Don't have an account?{' '}
+        {UI_TEXT.AUTH_NO_ACCOUNT}{' '}
         <Link to={ROUTES.REGISTER} className="text-primary hover:underline">
-          Create one
+          {UI_TEXT.AUTH_CREATE_ONE}
         </Link>
       </div>
     </form>

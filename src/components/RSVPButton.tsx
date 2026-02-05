@@ -1,7 +1,9 @@
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
 import { RsvpStatus } from '../types/rsvp.types';
 import { rsvpApi } from '../services/api/rsvp.api';
 import Button from './Button';
+import { BUTTON_TEXT, ERROR_MESSAGES } from '../constants/text.constants';
+import { toast } from 'react-hot-toast';
 
 interface RSVPButtonProps {
     eventId: string;
@@ -20,17 +22,18 @@ const RSVPButton = memo(({ eventId, currentStatus, onStatusChange, isFull }: RSV
             onStatusChange?.(status);
         } catch (error) {
             console.error('RSVP failed', error);
-            alert('Failed to update RSVP');
+            toast.error(ERROR_MESSAGES.RSVP_FAILED);
         } finally {
             setIsLoading(false);
         }
     }, [eventId, onStatusChange]);
 
-    if (currentStatus === RsvpStatus.GOING) {
-         return (
+    // Configuration Map for Button States
+    const rsvpConfig = useMemo(() => ({
+        [RsvpStatus.GOING]: (
             <div className="flex gap-2">
                 <Button variant="outline" disabled className="bg-green-50 text-green-700 border-green-200">
-                     ✓ Going
+                     {BUTTON_TEXT.GOING}
                 </Button>
                 <Button 
                     variant="ghost" 
@@ -39,21 +42,32 @@ const RSVPButton = memo(({ eventId, currentStatus, onStatusChange, isFull }: RSV
                     isLoading={isLoading}
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                 >
-                    Cancel
+                    {BUTTON_TEXT.CANCEL}
                 </Button>
             </div>
-        );
-    }
+        ),
+        [RsvpStatus.NOT_GOING]: (
+             <Button 
+                onClick={() => handleRsvp(RsvpStatus.GOING)} 
+                isLoading={isLoading}
+                disabled={isFull}
+            >
+                {isFull ? BUTTON_TEXT.SOLD_OUT : BUTTON_TEXT.JOIN_EVENT}
+            </Button>
+        ),
+        [RsvpStatus.MAYBE]: ( // Fallback to same as NOT_GOING/Default for now if needed, or handle explicitly
+             <Button 
+                onClick={() => handleRsvp(RsvpStatus.GOING)} 
+                isLoading={isLoading}
+                disabled={isFull}
+            >
+                {isFull ? BUTTON_TEXT.SOLD_OUT : BUTTON_TEXT.JOIN_EVENT}
+            </Button>
+        )
+    }), [isLoading, isFull, handleRsvp]);
 
-    return (
-        <Button 
-            onClick={() => handleRsvp(RsvpStatus.GOING)} 
-            isLoading={isLoading}
-            disabled={isFull}
-        >
-            {isFull ? 'Sold Out' : 'Join Event'}
-        </Button>
-    );
+    // Default to NOT_GOING view if status is undefined or NOT_GOING
+    return rsvpConfig[currentStatus || RsvpStatus.NOT_GOING] || rsvpConfig[RsvpStatus.NOT_GOING];
 });
 
 export default RSVPButton;

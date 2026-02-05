@@ -43,8 +43,7 @@ function App() {
                  accessToken: data.accessToken 
              }));
         }
-      } catch (error) {
-        console.warn('Session restoration failed or no active session');
+      } catch {
         dispatch(logout()); 
       } finally {
         dispatch(setLoading(false));

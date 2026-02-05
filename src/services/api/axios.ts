@@ -1,7 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import { APP_CONFIG } from '../../constants/app.config';
 import { store } from '../../store/store';
 import { logout, setCredentials } from '../../store/authSlice';
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
 
 const api = axios.create({
   baseURL: APP_CONFIG.API_URL,
@@ -27,10 +32,11 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/login')) {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig;
+    
+    // Check if error is 401 and not a retry and not a login request
+    if (originalRequest && error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/login')) {
       originalRequest._retry = true;
 
       try {

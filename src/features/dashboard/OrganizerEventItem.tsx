@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Calendar, ScanLine } from 'lucide-react';
 import Button from '../../components/Button';
 import type { IEvent } from '../../types/event.types';
+import { UI_TEXT } from '../../constants/text.constants';
 
 interface OrganizerEventItemProps {
     event: IEvent;
@@ -38,9 +39,9 @@ export const OrganizerEventItem = memo(({ event, onScan, onManage }: OrganizerEv
                         onClick={() => onScan(event._id)}
                         className="text-primary hover:bg-primary/5 border-primary/20"
                         >
-                        <ScanLine className="w-4 h-4 mr-1" /> Scan
+                        <ScanLine className="w-4 h-4 mr-1" /> {UI_TEXT.EVENT_ITEM_KEY_SCAN}
                         </Button>
-                        <Button size="sm" variant="secondary" onClick={() => onManage(event._id)}>Manage</Button>
+                        <Button size="sm" variant="secondary" onClick={() => onManage(event._id)}>{UI_TEXT.EVENT_ITEM_KEY_MANAGE}</Button>
                     </div>
                 </div>
         </div>

@@ -1,12 +1,9 @@
-import { useEffect, useState } from 'react';
-import { communityApi } from '../../services/api/community.api';
-import { type ICommunity } from '../../types/community.types';
-import Button from '../../components/Button';
 import { MapPin, Users, Lock, Globe, Briefcase } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../components/Button';
 import { useAuth } from '../../hooks/useAuth';
-import { AxiosError } from 'axios';
+import { useCommunityList } from '../../hooks/community/useCommunityList';
+import { UI_TEXT } from '../../constants/text.constants';
 
 const COMMUNITY_ICONS = {
     'NEIGHBORHOOD': <Lock className="w-6 h-6" />,
@@ -17,43 +14,13 @@ const COMMUNITY_ICONS = {
 const CommunityList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [communities, setCommunities] = useState<ICommunity[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { communities, isLoading, handleJoin } = useCommunityList();
 
-    useEffect(() => {
-        const fetchCommunities = async () => {
-            try {
-                // Fetch near location if available, otherwise all (MVP)
-                // In real app we get geo from navigator.geolocation
-                const data = await communityApi.getAll(); 
-                setCommunities(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchCommunities();
-    }, []);
-
-    const handleJoin = async (id: string) => {
-        try {
-            await communityApi.join(id);
-            toast.success('Joined community successfully!');
-            // Refresh logic here ideally
-        } catch (err: unknown) {
-            const message = err instanceof AxiosError 
-                ? err.response?.data?.message 
-                : 'Failed to join';
-            toast.error(message);
-        }
-    };
-
-    if (isLoading) return <div className="py-8 text-center text-textSecondary">Finding communities near you...</div>;
+    if (isLoading) return <div className="py-8 text-center text-textSecondary">{UI_TEXT.COMMUNITY_LOADING}</div>;
 
     if (communities.length === 0) return (
          <div className="py-8 text-center text-textSecondary">
-            No communities found. Be the first to start one!
+            {UI_TEXT.COMMUNITY_EMPTY}
          </div>
     );
 
@@ -77,26 +44,26 @@ const CommunityList = () => {
                     <div className="flex items-center gap-4 text-xs text-textSecondary mb-6">
                         <div className="flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
-                            <span>Nearby</span> {/* We could calc distance */}
+                            <span>{UI_TEXT.COMMUNITY_NEARBY}</span>
                         </div>
                         <div className="flex items-center gap-1">
                             <Users className="w-3 h-3" />
-                            <span>{community.members.length} Members</span>
+                            <span>{community.members.length} {UI_TEXT.COMMUNITY_MEMBERS_SUFFIX}</span>
                         </div>
                     </div>
 
                     {isMember ? (
                         <div className="flex flex-col gap-2">
                              <div className="bg-green-50 text-green-700 text-center py-2 rounded-lg text-sm font-bold border border-green-100 mb-1">
-                                 ✅ Joined
+                                 {UI_TEXT.COMMUNITY_JOINED_BADGE}
                              </div>
                              <Button onClick={() => navigate(`/communities/${community._id}`)} variant="outline" className="w-full">
-                                 View Details
+                                 {UI_TEXT.COMMUNITY_VIEW_DETAILS}
                              </Button>
                         </div>
                     ) : (
                         <Button onClick={() => handleJoin(community._id)} variant="secondary" className="w-full">
-                            Join Community
+                            {UI_TEXT.COMMUNITY_JOIN}
                         </Button>
                     )}
                 </div>

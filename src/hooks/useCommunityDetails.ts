@@ -4,6 +4,7 @@ import { communityApi } from '../services/api/community.api';
 import type { ICommunity } from '../types/community.types';
 import type { IEvent } from '../types/event.types';
 import { toast } from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 export const useCommunityDetails = (id: string | undefined) => {
     const { user } = useAuth();
@@ -29,7 +30,7 @@ export const useCommunityDetails = (id: string | undefined) => {
             // It's inefficient but safe without viewing api file.
             
             const all = await communityApi.getAll(); 
-            const found = all.find(c => c._id === id);
+            const found = all.find((c: ICommunity) => c._id === id);
             setCommunity(found || null);
             
             if (found) {
@@ -58,9 +59,12 @@ export const useCommunityDetails = (id: string | undefined) => {
             await communityApi.join(id);
             toast.success('Joined community!');
             setCommunity(prev => prev && user && user.id ? { ...prev, members: [...prev.members, user.id] } : null);
-        } catch (error: any) {
-             toast.error(error.response?.data?.message || 'Failed to join');
-        } finally {
+        } catch (error: unknown) {
+             if (error instanceof AxiosError) {
+                 toast.error(error.response?.data?.message || 'Failed to join');
+             } else {
+                 toast.error('Failed to join');
+             }
             setIsJoining(false);
         }
     }, [id, user]);
@@ -72,9 +76,12 @@ export const useCommunityDetails = (id: string | undefined) => {
             await communityApi.leave(id);
             toast.success('Left community');
             setCommunity(prev => prev && user ? { ...prev, members: prev.members.filter(m => m !== user.id) } : null);
-        } catch (error: any) {
-             toast.error(error.response?.data?.message || 'Failed to leave');
-        } finally {
+        } catch (error: unknown) {
+             if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message || 'Failed to leave');
+             } else {
+                toast.error('Failed to leave');
+             }
             setIsJoining(false);
         }
     }, [id, user]);

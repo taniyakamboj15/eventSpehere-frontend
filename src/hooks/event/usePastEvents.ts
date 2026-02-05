@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { eventApi } from '../services/api/event.api';
-import type { IEvent } from '../types/event.types';
+import { eventApi } from '../../services/api/event.api';
+import type { IEvent } from '../../types/event.types';
 
 export const usePastEvents = () => {
     const [events, setEvents] = useState<IEvent[]>([]);

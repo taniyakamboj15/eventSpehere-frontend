@@ -56,3 +56,5 @@ export const eventSchema = Yup.object().shape({
   }),
   photos: Yup.array().of(Yup.string()).optional(),
 });
+
+export type EventFormData = Yup.InferType<typeof eventSchema>;

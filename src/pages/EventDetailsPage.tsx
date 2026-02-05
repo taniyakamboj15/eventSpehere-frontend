@@ -6,6 +6,7 @@ import CommentSection from '../features/comment/CommentSection';
 import EventMap from '../components/EventMap';
 import ImageUpload from '../components/ImageUpload';
 import { useEventDetails } from '../hooks/useEventDetails';
+import { UI_TEXT, BUTTON_TEXT, DATE_FORMATS } from '../constants/text.constants';
 
 const EventDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,9 +23,11 @@ const EventDetailsPage = () => {
     } = useEventDetails(id);
 
     if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
-    if (!event) return <div className="text-center py-20">Event not found</div>;
+    if (!event) return <div className="text-center py-20">{UI_TEXT.EVENT_NOT_FOUND}</div>;
 
     const { canManage, canUpload } = permissions;
+    const organizerName = typeof event.organizer === 'string' ? UI_TEXT.DEFAULT_ORGANIZER_NAME : event.organizer.name;
+    const organizerInitial = organizerName.charAt(0);
 
     return (
         <div className="min-h-screen bg-gray-50/50">
@@ -74,9 +77,9 @@ const EventDetailsPage = () => {
                                         <Calendar className="w-6 h-6 text-primary" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-1">When</h4>
-                                        <p className="text-text font-semibold">{format(new Date(event.startDateTime), 'PPPP')}</p>
-                                        <p className="text-textSecondary text-sm">{format(new Date(event.startDateTime), 'p')} – {format(new Date(event.endDateTime), 'p')}</p>
+                                        <h4 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-1">{UI_TEXT.WHEN_LABEL}</h4>
+                                        <p className="text-text font-semibold">{format(new Date(event.startDateTime), DATE_FORMATS.EVENT_DETAILS_DATE)}</p>
+                                        <p className="text-textSecondary text-sm">{format(new Date(event.startDateTime), DATE_FORMATS.EVENT_DETAILS_TIME)} – {format(new Date(event.endDateTime), DATE_FORMATS.EVENT_DETAILS_TIME)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
@@ -84,20 +87,20 @@ const EventDetailsPage = () => {
                                         <MapPin className="w-6 h-6 text-primary" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-1">Where</h4>
+                                        <h4 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-1">{UI_TEXT.WHERE_LABEL}</h4>
                                         <p className="text-text font-semibold">{event.location.address}</p>
                                         <button 
                                             onClick={scrollToMap}
                                             className="text-primary text-sm font-bold hover:underline mt-1"
                                         >
-                                            View on Map
+                                            {BUTTON_TEXT.VIEW_ON_MAP}
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="prose prose-lg max-w-none text-textSecondary">
-                                <h3 className="text-2xl font-black text-text mb-4">Event Description</h3>
+                                <h3 className="text-2xl font-black text-text mb-4">{UI_TEXT.EVENT_DESCRIPTION_TITLE}</h3>
                                 <div className="leading-relaxed whitespace-pre-wrap">
                                     {event.description}
                                 </div>
@@ -105,7 +108,7 @@ const EventDetailsPage = () => {
                         </div>
 
                         <div id="event-location-map" className="bg-surface p-8 rounded-3xl border border-border shadow-sm">
-                            <h3 className="text-2xl font-black text-text mb-6">Location</h3>
+                            <h3 className="text-2xl font-black text-text mb-6">{UI_TEXT.LOCATION_TITLE}</h3>
                             <EventMap 
                                 latitude={event.location.coordinates[1]} 
                                 longitude={event.location.coordinates[0]} 
@@ -116,7 +119,7 @@ const EventDetailsPage = () => {
                         {/* Shared Gallery */}
                         <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm">
                              <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-black text-text">Photo Gallery</h3>
+                                <h3 className="text-2xl font-black text-text">{UI_TEXT.PHOTO_GALLERY_TITLE}</h3>
                              </div>
 
                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -124,11 +127,11 @@ const EventDetailsPage = () => {
                                 {canUpload && (
                                      <div className="aspect-square rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors flex items-center justify-center relative overflow-hidden group">
                                          <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center bg-black/50">
-                                             <span className="text-white font-bold text-sm">Add Photo</span>
+                                             <span className="text-white font-bold text-sm">{UI_TEXT.ADD_PHOTO_LABEL}</span>
                                          </div>
                                          <div className="text-center p-4">
                                              <Camera className="w-8 h-8 text-primary mx-auto mb-2" />
-                                             <span className="text-xs font-bold text-primary uppercase tracking-wide">Add Memory</span>
+                                             <span className="text-xs font-bold text-primary uppercase tracking-wide">{UI_TEXT.ADD_MEMORY_LABEL}</span>
                                          </div>
                                          {/* Hidden ImageUpload overlay */}
                                          <div className="absolute inset-0 z-20 opacity-0">
@@ -149,7 +152,7 @@ const EventDetailsPage = () => {
                                 
                                 {(!event.photos || event.photos.length === 0) && !permissions.isEventEnded && (
                                     <div className="col-span-full py-8 text-center text-textSecondary bg-gray-50 rounded-xl border border-dashed border-border">
-                                        No photos yet.
+                                        {UI_TEXT.NO_PHOTOS_MESSAGE}
                                     </div>
                                 )}
                             </div>
@@ -168,12 +171,12 @@ const EventDetailsPage = () => {
                             
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-xl font-black text-primary">
-                                    {typeof event.organizer === 'string' ? 'O' : event.organizer.name.charAt(0)}
+                                    {organizerInitial}
                                 </div>
                                 <div>
-                                    <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-0.5">Organized by</span>
+                                    <span className="block text-xs font-bold text-textSecondary uppercase tracking-widest mb-0.5">{UI_TEXT.ORGANIZED_BY_LABEL}</span>
                                     <span className="font-black text-lg text-text">
-                                        {typeof event.organizer === 'string' ? 'Organizer' : event.organizer.name}
+                                        {organizerName}
                                     </span>
                                 </div>
                             </div>
@@ -185,7 +188,7 @@ const EventDetailsPage = () => {
                                         className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-sm font-bold transition-all shadow-lg shadow-slate-900/20 mb-4"
                                     >
                                         <Settings className="w-4 h-4" />
-                                        Manage Event
+                                        {BUTTON_TEXT.MANAGE_EVENT}
                                     </a>
                                 )}
                                 <RSVPButton 
@@ -203,14 +206,14 @@ const EventDetailsPage = () => {
                                         className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 border border-border rounded-xl text-sm font-bold transition-all"
                                     >
                                         <Calendar className="w-4 h-4" />
-                                        Add to Calendar
+                                        {BUTTON_TEXT.ADD_TO_CALENDAR}
                                     </a>
                                 )}
                             </div>
 
                             <div className="mt-8 pt-8 border-t border-border/60">
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="text-sm font-bold text-textSecondary uppercase">Attendees</span>
+                                    <span className="text-sm font-bold text-textSecondary uppercase">{UI_TEXT.ATTENDEES_LABEL}</span>
                                     <span className="text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded-md">
                                         {event.attendeeCount} / {event.capacity}
                                     </span>

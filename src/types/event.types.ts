@@ -40,7 +40,7 @@ export interface IEvent {
   capacity: number;
   attendeeCount: number;
   organizer: string | { _id: string; name: string }; // Populated or ID
-  community?: string;
+  community?: string | { _id: string; name: string };
   photos: string[];
   googleCalendarLink?: string;
   userRsvpStatus?: RsvpStatus | null;

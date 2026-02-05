@@ -11,6 +11,7 @@ import {
 import { UseCaseCard } from '../features/home/UseCaseCard';
 import { FeatureItem } from '../features/home/FeatureItem';
 import { PastEventsSection } from '../features/home/PastEventsSection';
+import { UI_TEXT } from '../constants/text.constants';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
@@ -24,32 +25,31 @@ const HomePage = () => {
                 <div className="container mx-auto px-4 text-center">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-in">
                         <Sparkles className="w-4 h-4" />
-                        <span>The Ultimate Community Platform</span>
+                        <span>{UI_TEXT.HOME_HERO_BADGE}</span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-bold text-text mb-6 tracking-tight">
-                        Connect with your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Community</span>
+                        {UI_TEXT.HOME_HERO_TITLE_PREFIX} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{UI_TEXT.HOME_HERO_TITLE_HIGHLIGHT}</span>
                     </h1>
                     <p className="text-xl text-textSecondary max-w-2xl mx-auto mb-10 leading-relaxed">
-                        Discover local events, join neighborhood associations, and connect with hobby groups. 
-                        EventSphere brings people together in the real world.
+                        {UI_TEXT.HOME_HERO_SUBTITLE}
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Button size="lg" onClick={() => navigate(ROUTES.EVENTS)}>
-                            Discover Events
+                            {UI_TEXT.HOME_HERO_CTA_DISCOVER}
                         </Button>
                         {!isAuthenticated && (
                             <Link to={ROUTES.REGISTER}>
-                                <Button size="lg" variant="outline">Get Started</Button>
+                                <Button size="lg" variant="outline">{UI_TEXT.HOME_HERO_CTA_GET_STARTED}</Button>
                             </Link>
                         )}
                         {isAuthenticated && user?.role === UserRole.ATTENDEE && (
                              <Button size="lg" variant="outline" onClick={() => navigate(ROUTES.DASHBOARD)}>
-                                My Dashboard
+                                {UI_TEXT.HOME_HERO_CTA_MY_DASHBOARD}
                              </Button>
                         )}
                         {isAuthenticated && (user?.role === UserRole.ORGANIZER || user?.role === UserRole.ADMIN) && (
                              <Button size="lg" variant="outline" onClick={() => navigate(ROUTES.DASHBOARD)}>
-                                Dashboard
+                                {UI_TEXT.HOME_HERO_CTA_DASHBOARD}
                              </Button>
                         )}
                     </div>
@@ -59,28 +59,28 @@ const HomePage = () => {
             {/* Use Cases Section */}
             <section className="container mx-auto px-4">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl font-bold text-text mb-4">Designed for Every Community</h2>
-                    <p className="text-textSecondary">Whether you are a neighbor, a hobbyist, or a business owner.</p>
+                    <h2 className="text-3xl font-bold text-text mb-4">{UI_TEXT.HOME_USE_CASES_TITLE}</h2>
+                    <p className="text-textSecondary">{UI_TEXT.HOME_USE_CASES_SUBTITLE}</p>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                     <UseCaseCard 
                         icon={Users}
-                        title="Neighborhood Associations" 
-                        desc="Manage HOA meetings, block parties, and local updates with private community events."
+                        title={UI_TEXT.HOME_UC_HOA_TITLE}
+                        desc={UI_TEXT.HOME_UC_HOA_DESC}
                         color="text-blue-500"
                         bg="bg-blue-50"
                     />
                     <UseCaseCard 
                         icon={Sparkles} 
-                        title="Hobby Groups" 
-                        desc="Organize weekly meetups for hiking, gaming, book clubs, and shared interests."
+                        title={UI_TEXT.HOME_UC_HOBBY_TITLE} 
+                        desc={UI_TEXT.HOME_UC_HOBBY_DESC}
                         color="text-purple-500"
                         bg="bg-purple-50"
                     />
                     <UseCaseCard 
                         icon={Store} 
-                        title="Local Businesses" 
-                        desc="Promote grand openings, sales, and workshops to your local audience."
+                        title={UI_TEXT.HOME_UC_BIZ_TITLE}
+                        desc={UI_TEXT.HOME_UC_BIZ_DESC}
                         color="text-orange-500"
                         bg="bg-orange-50"
                     />
@@ -94,48 +94,47 @@ const HomePage = () => {
             <section className="bg-surface py-20 border-y border-border">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-text mb-4">Everything You Need</h2>
-                        <p className="text-textSecondary">Powerful features to manage successful events.</p>
+                        <h2 className="text-3xl font-bold text-text mb-4">{UI_TEXT.HOME_FEATURES_TITLE}</h2>
+                        <p className="text-textSecondary">{UI_TEXT.HOME_FEATURES_SUBTITLE}</p>
                     </div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <FeatureItem icon={Calendar} title="Event Creation" desc="Easy scheduling with date, time, and capacity limits." />
-                        <FeatureItem icon={Shield} title="Privacy Controls" desc="Public, Community-only, or Private Invite visibility." />
-                        <FeatureItem icon={MapPin} title="Interactive Maps" desc="Find events near you with geolocation." />
-                        <FeatureItem icon={Users} title="Attendee Management" desc="Track RSVPs and manage guest lists." />
-                        <FeatureItem icon={Bell} title="Smart Notifications" desc="Automated email updates for attendees." />
-                        <FeatureItem icon={CheckCircle} title="Event Check-in" desc="Seamless QR or manual check-in on event day." />
-                        <FeatureItem icon={Camera} title="Photo Gallery" desc="Share memories from past events." />
-                        <FeatureItem icon={MessageCircle} title="Discussions" desc="Q&A section for every event." />
-                        <FeatureItem icon={Repeat} title="Recurring Events" desc="Schedule weekly or monthly meetups easily." />
-                        <FeatureItem icon={Search} title="Discovery" desc="Interest-based search and categories." />
-                        <FeatureItem icon={Calendar} title="Calendar Sync" desc="Add events directly to Google Calendar." />
+                        <FeatureItem icon={Calendar} title={UI_TEXT.HOME_FEAT_CREATION_TITLE} desc={UI_TEXT.HOME_FEAT_CREATION_DESC} />
+                        <FeatureItem icon={Shield} title={UI_TEXT.HOME_FEAT_PRIVACY_TITLE} desc={UI_TEXT.HOME_FEAT_PRIVACY_DESC} />
+                        <FeatureItem icon={MapPin} title={UI_TEXT.HOME_FEAT_MAPS_TITLE} desc={UI_TEXT.HOME_FEAT_MAPS_DESC} />
+                        <FeatureItem icon={Users} title={UI_TEXT.HOME_FEAT_ATTENDEES_TITLE} desc={UI_TEXT.HOME_FEAT_ATTENDEES_DESC} />
+                        <FeatureItem icon={Bell} title={UI_TEXT.HOME_FEAT_NOTIFS_TITLE} desc={UI_TEXT.HOME_FEAT_NOTIFS_DESC} />
+                        <FeatureItem icon={CheckCircle} title={UI_TEXT.HOME_FEAT_CHECKIN_TITLE} desc={UI_TEXT.HOME_FEAT_CHECKIN_DESC} />
+                        <FeatureItem icon={Camera} title={UI_TEXT.HOME_FEAT_GALLERY_TITLE} desc={UI_TEXT.HOME_FEAT_GALLERY_DESC} />
+                        <FeatureItem icon={MessageCircle} title={UI_TEXT.HOME_FEAT_DISCUSS_TITLE} desc={UI_TEXT.HOME_FEAT_DISCUSS_DESC} />
+                        <FeatureItem icon={Repeat} title={UI_TEXT.HOME_FEAT_RECUR_TITLE} desc={UI_TEXT.HOME_FEAT_RECUR_DESC} />
+                        <FeatureItem icon={Search} title={UI_TEXT.HOME_FEAT_DISCOVERY_TITLE} desc={UI_TEXT.HOME_FEAT_DISCOVERY_DESC} />
+                        <FeatureItem icon={Calendar} title={UI_TEXT.HOME_FEAT_CALENDAR_TITLE} desc={UI_TEXT.HOME_FEAT_CALENDAR_DESC} />
                     </div>
                 </div>
             </section>
-
+            
             {/* Call to Action - Organizer */}
             <section className="container mx-auto px-4">
                 <div className="bg-gradient-to-r from-primary to-secondary rounded-3xl p-12 text-center text-white shadow-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-black/10" />
                     <div className="relative z-10 max-w-3xl mx-auto space-y-6">
-                        <h2 className="text-3xl md:text-4xl font-bold">Ready to Lead Your Community?</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold">{UI_TEXT.HOME_CTA_TITLE}</h2>
                         <p className="text-blue-100 text-lg">
-                            Become an organizer today to access advanced tools, analytics, and community management features.
-                            Admins review every application to ensure quality.
+                            {UI_TEXT.HOME_CTA_DESC}
                         </p>
                         {isAuthenticated ? (
                             user?.role === UserRole.ORGANIZER || user?.role === UserRole.ADMIN ? (
                                 <Button size="lg" variant="secondary" onClick={() => navigate(ROUTES.CREATE_EVENT)}>
-                                    Create Event
+                                    {UI_TEXT.HOME_CTA_CREATE_EVENT}
                                 </Button>
                             ) : (
                                 <Button size="lg" variant="secondary" onClick={() => navigate(ROUTES.DASHBOARD)}>
-                                    Become an Organizer
+                                    {UI_TEXT.HOME_CTA_BECOME_ORGANIZER}
                                 </Button>
                             )
                         ) : (
                             <Link to={ROUTES.REGISTER}>
-                                <Button size="lg" variant="secondary">Sign Up Now</Button>
+                                <Button size="lg" variant="secondary">{UI_TEXT.HOME_CTA_SIGN_UP}</Button>
                             </Link>
                         )}
                     </div>

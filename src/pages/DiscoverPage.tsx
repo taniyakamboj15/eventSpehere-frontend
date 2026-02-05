@@ -4,6 +4,7 @@ import EventCard from '../components/EventCard';
 import { Loader2, Search, Calendar, MapPin } from 'lucide-react';
 import CommunityList from '../features/community/CommunityList';
 import { useDiscoverEvents } from '../hooks/useDiscoverEvents';
+import { UI_TEXT } from '../constants/text.constants';
 
 const DiscoverPage = () => {
   const { 
@@ -27,20 +28,20 @@ const DiscoverPage = () => {
              {/* Header */}
              <div className="bg-surface border-b border-border sticky top-0 z-30">
                  <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                     <h1 className="text-2xl font-black text-text">Discover</h1>
+                     <h1 className="text-2xl font-black text-text">{UI_TEXT.DISCOVER_TITLE}</h1>
                      {/* Tab Switcher */}
                      <div className="flex bg-gray-100 p-1 rounded-xl">
                          <button 
                              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'events' ? 'bg-white shadow text-primary' : 'text-textSecondary hover:text-text'}`}
                              onClick={() => setActiveTab('events')}
                          >
-                             Events
+                             {UI_TEXT.EVENTS_TAB}
                          </button>
                          <button 
                              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'communities' ? 'bg-white shadow text-primary' : 'text-textSecondary hover:text-text'}`}
                              onClick={() => setActiveTab('communities')}
                          >
-                             Communities
+                             {UI_TEXT.COMMUNITIES_TAB}
                          </button>
                      </div>
                  </div>
@@ -56,7 +57,7 @@ const DiscoverPage = () => {
                                      : 'bg-white border border-border text-textSecondary hover:bg-gray-50'
                                  }`}
                              >
-                                 All
+                                 {UI_TEXT.ALL_FILTER}
                              </button>
                              {Object.values(EventCategory).map((category) => (
                                  <button
@@ -86,10 +87,10 @@ const DiscoverPage = () => {
                             
                             <div className="relative z-10 max-w-3xl">
                             <h1 className="text-4xl md:text-6xl font-black text-text mb-6 tracking-tight">
-                                Discover What's <span className="text-primary italic">Happening</span>
+                                {UI_TEXT.DISCOVER_HERO_TITLE_PREFIX} <span className="text-primary italic">{UI_TEXT.DISCOVER_HERO_TITLE_SUFFIX}</span>
                             </h1>
                             <p className="text-lg text-textSecondary mb-10 leading-relaxed max-w-xl">
-                                Explore workshops, meetups, and local events specifically curated for your community interests.
+                                {UI_TEXT.DISCOVER_HERO_SUBTITLE}
                             </p>
                             
                             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
@@ -99,7 +100,7 @@ const DiscoverPage = () => {
                                     <Search className="ml-5 w-6 h-6 text-textSecondary group-focus-within:text-primary transition-colors" />
                                     <input 
                                     type="text" 
-                                    placeholder="Search by title..." 
+                                    placeholder={UI_TEXT.SEARCH_PLACEHOLDER}
                                     className="w-full pl-4 pr-6 py-5 text-lg text-text placeholder:text-textSecondary/60 focus:outline-none"
                                     value={filters.search}
                                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
@@ -117,7 +118,7 @@ const DiscoverPage = () => {
                                 }`}
                                 >
                                 <MapPin className={`w-5 h-5 ${filters.location ? 'text-white' : 'text-primary'}`} />
-                                {filters.location ? (filters.location.name || 'Nearby') : 'Near Me'}
+                                {filters.location ? (filters.location.name || UI_TEXT.NEARBY_LABEL) : UI_TEXT.NEAR_ME_LABEL}
                                 </button>
                                 
                                 {filters.location && (
@@ -126,7 +127,7 @@ const DiscoverPage = () => {
                                         onClick={clearLocation}
                                         className="px-4 py-5 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition-all"
                                      >
-                                         Clear
+                                         {UI_TEXT.CLEAR_ACTION}
                                      </button>
                                 )}
                             </form>
@@ -136,11 +137,11 @@ const DiscoverPage = () => {
                         {/* Results Header */}
                         <div className="flex items-center justify-between px-2 mb-6">
                             <h2 className="text-2xl font-black text-text">
-                            {events.length} Upcoming Events
+                            {events.length} {UI_TEXT.UPCOMING_EVENTS_TITLE}
                             </h2>
                             <div className="flex gap-2">
                             {/* Add mini-filters here if needed */}
-                            <span className="text-xs font-bold text-textSecondary uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full border border-border/40">Latest</span>
+                            <span className="text-xs font-bold text-textSecondary uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full border border-border/40">{UI_TEXT.LATEST_LABEL}</span>
                             </div>
                         </div>
 
@@ -148,14 +149,14 @@ const DiscoverPage = () => {
                             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-10 h-10" /></div>
                         ) : error ? (
                             <div className="text-center py-20 bg-red-50 rounded-3xl border border-red-100">
-                                <p className="text-red-600 font-bold text-lg mb-2">Oops! Something went wrong</p>
+                                <p className="text-red-600 font-bold text-lg mb-2">{UI_TEXT.OOPS_ERROR}</p>
                                 <p className="text-red-400">{error}</p>
                             </div>
                         ) : events.length === 0 ? (
                             <div className="col-span-full py-20 text-center bg-gray-50 rounded-[3rem] border border-dashed border-gray-200">
                                 <Calendar className="w-16 h-16 mx-auto mb-6 text-gray-200" />
-                                <h3 className="text-2xl font-black text-text mb-2">No events found</h3>
-                                <p className="text-textSecondary">Try adjusting your search terms or check back later.</p>
+                                <h3 className="text-2xl font-black text-text mb-2">{UI_TEXT.NO_EVENTS_FOUND_TITLE}</h3>
+                                <p className="text-textSecondary">{UI_TEXT.NO_EVENTS_FOUND_SUBTITLE}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

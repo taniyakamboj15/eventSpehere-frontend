@@ -1,49 +1,98 @@
-import { useEffect, useState } from 'react';
-import { rsvpApi } from '../../services/api/rsvp.api';
-import EventCard from '../../components/EventCard';
-import { Loader2 } from 'lucide-react';
-import type { IEvent } from '../../types/event.types';
-import type { IRsvp } from '../../types/rsvp.types';
+import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, X } from 'lucide-react';
+import QRCode from 'react-qr-code';
+import { type IRsvp, RsvpStatus } from '../../types/rsvp.types';
+import { UI_TEXT } from '../../constants/text.constants';
+import Button from '../../components/Button';
+import { AttendeeEventItem } from '../dashboard/AttendeeEventItem';
 
-const JoinedEventsList = () => {
-    const [events, setEvents] = useState<IEvent[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface JoinedEventsListProps {
+    rsvps: IRsvp[];
+    loading: boolean;
+}
 
-    useEffect(() => {
-        const fetchJoined = async () => {
-            try {
-                // Now strictly typed
-                const rsvps: IRsvp[] = await rsvpApi.getMyRsvps();
-                const joinedEvents = rsvps
-                    .filter((rsvp) => rsvp.status === 'GOING' && rsvp.event && typeof rsvp.event !== 'string')
-                    .map((rsvp) => rsvp.event as IEvent);
-                setEvents(joinedEvents);
-            } catch (error) {
-                console.error('Failed to fetch joined events', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchJoined();
+export const JoinedEventsList = ({ rsvps, loading }: JoinedEventsListProps) => {
+    const navigate = useNavigate();
+    const [selectedTicket, setSelectedTicket] = useState<IRsvp | null>(null);
+
+    const handleNavigate = useCallback((path: string) => {
+        navigate(path);
+    }, [navigate]);
+
+    const handleTicket = useCallback((ticket: IRsvp) => {
+        setSelectedTicket(ticket);
     }, []);
 
-    if (isLoading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-primary" /></div>;
-
-    if (events.length === 0) {
+    if (loading) {
         return (
-            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-textSecondary">You haven't joined any events yet.</p>
+            <div className="grid md:grid-cols-2 gap-6">
+                {[1, 2].map(i => (
+                    <div key={i} className="h-32 bg-surface animate-pulse border border-border rounded-xl"></div>
+                ))}
+            </div>
+        );
+    }
+    
+    
+    const upcoming = (rsvps || []).filter((r) => 
+        r && (r.status === RsvpStatus.GOING || r.status === RsvpStatus.MAYBE)
+    );
+
+
+    if (upcoming.length === 0) {
+        return (
+            <div className="bg-surface border border-dashed border-border rounded-xl p-12 text-center">
+                <Calendar className="w-12 h-12 text-textSecondary/40 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-text mb-2">{UI_TEXT.DASHBOARD_NO_EVENTS_TITLE}</h3>
+                <p className="text-textSecondary mb-6">{UI_TEXT.DASHBOARD_NO_EVENTS_MSG}</p>
+                <Button variant="outline" onClick={() => navigate('/events')}>{UI_TEXT.DASHBOARD_BROWSE_EVENTS}</Button>
             </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map(event => (
-                <EventCard key={event._id} event={event} />
+        <div className="grid md:grid-cols-2 gap-6">
+            {upcoming.map((rsvp) => (
+                <AttendeeEventItem 
+                    key={rsvp._id} 
+                    rsvp={rsvp} 
+                    onNavigate={handleNavigate}
+                    onTicket={handleTicket}
+                />
             ))}
+            
+            {/* Ticket Modal */}
+            {selectedTicket && selectedTicket.ticketCode && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedTicket(null)}>
+                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center relative animate-fade-in" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={() => setSelectedTicket(null)}
+                            className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                        
+                        <div className="mb-6">
+                            <h3 className="text-2xl font-black text-text mb-1">{UI_TEXT.DASHBOARD_TICKET_TITLE}</h3>
+                            <p className="text-textSecondary text-sm">{UI_TEXT.DASHBOARD_TICKET_SUB}</p>
+                        </div>
+                        
+                        <div className="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 inline-block mb-6">
+                            <QRCode value={selectedTicket.ticketCode} size={200} />
+                        </div>
+
+                        <div className="space-y-1">
+                             <p className="font-bold text-text uppercase text-sm tracking-wider">{
+                                 (typeof selectedTicket.event === 'object' && selectedTicket.event !== null && 'title' in selectedTicket.event) 
+                                 ? (selectedTicket.event as { title: string }).title 
+                                 : 'Event'
+                             }</p>
+                             <p className="text-xs text-textSecondary font-mono">{selectedTicket.ticketCode}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
-
-export default JoinedEventsList;

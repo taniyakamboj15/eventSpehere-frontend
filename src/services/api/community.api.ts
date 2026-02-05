@@ -1,6 +1,7 @@
 import api from './axios';
 import { type ICommunity, CommunityType } from '../../types/community.types';
 import type { IEvent } from '../../types/event.types';
+import { type IUser } from '../../types/auth.types';
 
 export const communityApi = {
     getAll: async (params?: { latitude?: number; longitude?: number; memberId?: string }) => {
@@ -39,7 +40,7 @@ export const communityApi = {
     },
 
     getMembers: async (id: string) => {
-        const response = await api.get<{ data: { members: any[], admins: any[] } }>(`/communities/${id}/members`);
+        const response = await api.get<{ data: { members: IUser[], admins: IUser[] } }>(`/communities/${id}/members`);
         return response.data.data;
     },
 

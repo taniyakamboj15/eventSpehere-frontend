@@ -1,45 +1,13 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, useNavigate } from 'react-router-dom';
-import { registerSchema } from '../../validators/auth.schema';
-import { authApi, type RegisterDTO } from '../../services/api/auth.api';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
+import { useRegister } from '../../hooks/auth/useRegister';
+import { UI_TEXT } from '../../constants/text.constants';
 
 const RegisterForm = () => {
- 
-  const navigate = useNavigate();
-  const [serverError, setServerError] = useState<string | null>(null);
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterDTO>({
-    resolver: yupResolver(registerSchema),
-  });
-
-  const onSubmit = async (data: RegisterDTO) => {
-    try {
-      setServerError(null);
-      await authApi.register(data);
-      
-      toast.success('Registration successful! Please check your email for the OTP.');
-      navigate(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(data.email)}`);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        setServerError(error.response?.data?.message || 'Registration failed');
-        toast.error(error.response?.data?.message || 'Registration failed');
-      } else {
-        setServerError('An unexpected error occurred');
-        toast.error('An unexpected error occurred');
-      }
-    }
-  };
+  const { form, serverError, onSubmit } = useRegister();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = form;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -50,39 +18,39 @@ const RegisterForm = () => {
       )}
       
       <Input
-        label="Full Name"
+        label={UI_TEXT.AUTH_NAME_LABEL}
         name="name"
         type="text"
         register={register}
         error={errors.name}
-        placeholder="John Doe"
+        placeholder={UI_TEXT.AUTH_NAME_PLACEHOLDER}
       />
 
       <Input
-        label="Email"
+        label={UI_TEXT.AUTH_EMAIL_LABEL}
         name="email"
         type="email"
         register={register}
         error={errors.email}
-        placeholder="you@example.com"
+        placeholder={UI_TEXT.AUTH_EMAIL_PLACEHOLDER}
       />
       
       <Input
-        label="Password"
+        label={UI_TEXT.AUTH_PASSWORD_LABEL}
         name="password"
         type="password"
         register={register}
         error={errors.password}
-        placeholder="••••••••"
+        placeholder={UI_TEXT.AUTH_PASSWORD_PLACEHOLDER}
       />
 
       <Input
-        label="Confirm Password"
+        label={UI_TEXT.AUTH_CONFIRM_PASSWORD_LABEL}
         name="confirmPassword"
         type="password"
         register={register}
         error={errors.confirmPassword}
-        placeholder="••••••••"
+        placeholder={UI_TEXT.AUTH_PASSWORD_PLACEHOLDER}
       />
       
       <Button
@@ -90,13 +58,13 @@ const RegisterForm = () => {
         className="w-full"
         isLoading={isSubmitting}
       >
-        Sign Up
+        {UI_TEXT.AUTH_SIGN_UP_BUTTON}
       </Button>
       
       <div className="text-center text-sm text-textSecondary mt-4">
-        Already have an account?{' '}
+        {UI_TEXT.AUTH_HAS_ACCOUNT}{' '}
         <Link to={ROUTES.LOGIN} className="text-primary hover:underline">
-          Sign in
+          {UI_TEXT.AUTH_SIGN_IN_LINK}
         </Link>
       </div>
     </form>

@@ -114,9 +114,7 @@ const OrganizerDashboard = () => {
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
-                 {/* We need to fetch these. Ideally we lift state or add another query. 
-                     For MVP we will create a small sub-component or just fetch in useEffect.
-                 */}
+            
                  <MyCommunitiesList />
             </div>
         </div>

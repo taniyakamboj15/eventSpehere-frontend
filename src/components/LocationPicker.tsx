@@ -1,20 +1,10 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { configureLeafletIcons } from '../utils/map.utils';
 
 // Fix for default marker icon in leaflet
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+configureLeafletIcons();
 
 interface Location {
     lat: number;
@@ -24,10 +14,26 @@ interface Location {
 interface LocationPickerProps {
     initialLocation?: Location;
     onChange: (location: Location) => void;
+    forcePosition?: Location | null; // New prop to force update
 }
 
-const LocationPicker = ({ initialLocation, onChange }: LocationPickerProps) => {
+const MapUpdater = ({ position }: { position: Location }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.flyTo([position.lat, position.lng], map.getZoom());
+    }, [position, map]);
+    return null;
+};
+
+const LocationPicker = ({ initialLocation, onChange, forcePosition }: LocationPickerProps) => {
     const [position, setPosition] = useState<Location>(initialLocation || { lat: 51.505, lng: -0.09 });
+
+    // Sync state with forcePosition prop
+    useEffect(() => {
+        if (forcePosition) {
+            setPosition(forcePosition);
+        }
+    }, [forcePosition]);
 
     const LocationMarker = () => {
         useMapEvents({
@@ -54,6 +60,7 @@ const LocationPicker = ({ initialLocation, onChange }: LocationPickerProps) => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <LocationMarker />
+                <MapUpdater position={position} />
             </MapContainer>
             <p className="text-xs text-textSecondary mt-1 px-2">Click on the map to set event location</p>
         </div>
