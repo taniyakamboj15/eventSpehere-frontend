@@ -4,19 +4,12 @@ import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 
 export const createEventAction = async ({ request }: ActionFunctionArgs) => {
-  // We expect JSON submission for complex event data
-  // This is complex because of nested objects (location, recurringRule) and arrays (photos).
-  // If we rely on standard FormData submission from a simple form, we'd need to reconstruct it.
-  // OR we can send JSON via useSubmit(data, { method: 'post', encType: 'application/json' })
-  // If useSubmit is used with JSON, request.json() should work.
-  
   try {
     const contentType = request.headers.get("Content-Type");
     let data;
     if (contentType && contentType.includes("application/json")) {
         data = await request.json();
     } else {
-        // Fallback or error if we strictly expect JSON for complex forms
         throw new Error("JSON submission required for complex event data");
     }
 

@@ -19,7 +19,7 @@ export const loginAction = async ({ request }: ActionFunctionArgs) => {
           return { 
             success: false,
             error: error.response?.data?.message || 'Login failed',
-            fieldErrors: error.response?.data?.errors // Assuming backend returns structured errors
+            fieldErrors: error.response?.data?.errors 
           };
       }
       return { success: false, error: 'An unexpected error occurred' };
