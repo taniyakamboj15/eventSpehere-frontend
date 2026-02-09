@@ -1,7 +1,7 @@
 import { memo, type ReactElement } from 'react';
 import { cn } from '../../utils/cn';
 import type { FieldValues } from 'react-hook-form';
-import type { SelectFieldProps } from './types';
+import type { SelectFieldProps } from '../../types/form.types';
 import { INPUT_STYLES } from '../../constants/style.constants';
 
 const Select = memo(<T extends FieldValues>({ 

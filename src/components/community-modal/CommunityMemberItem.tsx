@@ -1,9 +1,8 @@
 import { UserMinus } from 'lucide-react';
 import { BUTTON_TEXT } from '../../constants/text.constants';
-import type { CommunityMemberItemProps } from './types';
+import type { CommunityMemberItemProps } from '../../types/community.types';
 
 const CommunityMemberItem = ({ member, isAdmin, isCurrentUser, onRemove }: CommunityMemberItemProps) => {
-    // Handle both _id and id
     const memberId = member._id || member.id;
     if (!memberId) return null;
 

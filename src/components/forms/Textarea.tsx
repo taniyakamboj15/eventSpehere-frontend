@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 import type { FieldValues } from 'react-hook-form';
-import type { TextareaFieldProps } from './types';
+import type { TextareaFieldProps } from '../../types/form.types';
 import { INPUT_STYLES } from '../../constants/style.constants';
 
 const Textarea = <T extends FieldValues>({ 

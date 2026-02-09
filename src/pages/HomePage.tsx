@@ -6,11 +6,11 @@ import { ROUTES } from '../constants/routes';
 import { UserRole } from '../types/auth.types';
 import { 
     Calendar, MapPin, Users, Sparkles, Store, Shield, 
-    Bell, Camera, MessageCircle, Repeat, CheckCircle, Search 
+    Bell, Camera, MessageCircle, CheckCircle,
 } from 'lucide-react';
 import { UseCaseCard } from '../features/home/UseCaseCard';
 import { FeatureItem } from '../features/home/FeatureItem';
-import { PastEventsSection } from '../features/home/PastEventsSection';
+
 import { UI_TEXT } from '../constants/text.constants';
 
 const HomePage = () => {
@@ -87,8 +87,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Past Events / Memories Section */}
-            <PastEventsSection />
 
             {/* Features Grid */}
             <section className="bg-surface py-20 border-y border-border">
@@ -106,9 +104,7 @@ const HomePage = () => {
                         <FeatureItem icon={CheckCircle} title={UI_TEXT.HOME_FEAT_CHECKIN_TITLE} desc={UI_TEXT.HOME_FEAT_CHECKIN_DESC} />
                         <FeatureItem icon={Camera} title={UI_TEXT.HOME_FEAT_GALLERY_TITLE} desc={UI_TEXT.HOME_FEAT_GALLERY_DESC} />
                         <FeatureItem icon={MessageCircle} title={UI_TEXT.HOME_FEAT_DISCUSS_TITLE} desc={UI_TEXT.HOME_FEAT_DISCUSS_DESC} />
-                        <FeatureItem icon={Repeat} title={UI_TEXT.HOME_FEAT_RECUR_TITLE} desc={UI_TEXT.HOME_FEAT_RECUR_DESC} />
-                        <FeatureItem icon={Search} title={UI_TEXT.HOME_FEAT_DISCOVERY_TITLE} desc={UI_TEXT.HOME_FEAT_DISCOVERY_DESC} />
-                        <FeatureItem icon={Calendar} title={UI_TEXT.HOME_FEAT_CALENDAR_TITLE} desc={UI_TEXT.HOME_FEAT_CALENDAR_DESC} />
+
                     </div>
                 </div>
             </section>
@@ -143,5 +139,6 @@ const HomePage = () => {
         </div>
     );
 };
+
 
 export default HomePage;

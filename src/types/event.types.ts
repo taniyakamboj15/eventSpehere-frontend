@@ -61,3 +61,7 @@ export interface EventImageProps {
 export interface EventInfoProps {
     event: IEvent;
 }
+
+export interface EventCardProps {
+    event: IEvent;
+}

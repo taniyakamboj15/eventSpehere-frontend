@@ -54,40 +54,44 @@ const MainLayout = () => {
       </main>
 
       <footer className="bg-surface border-t border-border mt-auto">
-        <div className="container mx-auto px-4 py-12">
-            <div className="grid md:grid-cols-4 gap-8">
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-primary">{UI_TEXT.BRAND_NAME}</h3>
-                    <p className="text-textSecondary text-sm">
+        <div className="container mx-auto px-4 py-20">
+            <div className="grid md:grid-cols-4 gap-12">
+                <div className="space-y-6">
+                    <h3 className="text-2xl font-black text-primary tracking-tighter">{UI_TEXT.BRAND_NAME}</h3>
+                    <p className="text-textSecondary text-base leading-relaxed font-medium">
                         {UI_TEXT.FOOTER_TAGLINE}
                     </p>
                 </div>
                 <div>
-                    <h4 className="font-semibold mb-3 text-text">{UI_TEXT.FOOTER_PLATFORM}</h4>
-                    <ul className="space-y-2 text-sm text-textSecondary">
-                        <li><Link to={ROUTES.EVENTS} className="hover:text-primary">{UI_TEXT.NAV_DISCOVER}</Link></li>
-                        <li><Link to={ROUTES.HOME} className="hover:text-primary">{UI_TEXT.FOOTER_FEATURES}</Link></li>
-                        <li><Link to={ROUTES.HOME} className="hover:text-primary">{UI_TEXT.FOOTER_PRICING}</Link></li>
+                    <h4 className="font-bold mb-6 text-text uppercase tracking-widest text-xs">{UI_TEXT.FOOTER_PLATFORM}</h4>
+                    <ul className="space-y-4 text-sm text-textSecondary font-medium">
+                        <li><Link to={ROUTES.EVENTS} className="hover:text-primary transition-colors">{UI_TEXT.NAV_DISCOVER}</Link></li>
+                        <li><Link to={ROUTES.HOME} className="hover:text-primary transition-colors">{UI_TEXT.FOOTER_FEATURES}</Link></li>
+                        <li><Link to={ROUTES.HOME} className="hover:text-primary transition-colors">{UI_TEXT.FOOTER_PRICING}</Link></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 className="font-semibold mb-3 text-text">{UI_TEXT.FOOTER_COMMUNITY}</h4>
-                    <ul className="space-y-2 text-sm text-textSecondary">
-                        <li><Link to={ROUTES.REGISTER} className="hover:text-primary">{UI_TEXT.FOOTER_SIGN_UP}</Link></li>
-                        <li><Link to={ROUTES.DASHBOARD} className="hover:text-primary">{UI_TEXT.FOOTER_BECOME_ORGANIZER}</Link></li>
-                        <li><a href="#" className="hover:text-primary">{UI_TEXT.FOOTER_GUIDELINES}</a></li>
+                    <h4 className="font-bold mb-6 text-text uppercase tracking-widest text-xs">{UI_TEXT.FOOTER_COMMUNITY}</h4>
+                    <ul className="space-y-4 text-sm text-textSecondary font-medium">
+                        <li><Link to={ROUTES.REGISTER} className="hover:text-primary transition-colors">{UI_TEXT.FOOTER_SIGN_UP}</Link></li>
+                        <li><Link to={ROUTES.DASHBOARD} className="hover:text-primary transition-colors">{UI_TEXT.FOOTER_BECOME_ORGANIZER}</Link></li>
+                        <li><a href="#" className="hover:text-primary transition-colors">{UI_TEXT.FOOTER_GUIDELINES}</a></li>
                     </ul>
                 </div>
                  <div>
-                    <h4 className="font-semibold mb-3 text-text">{UI_TEXT.FOOTER_CONTACT}</h4>
-                    <ul className="space-y-2 text-sm text-textSecondary">
-                        <li>support@eventsphere.com</li>
-                        <li>Twitter @EventSphere</li>
+                    <h4 className="font-bold mb-6 text-text uppercase tracking-widest text-xs">{UI_TEXT.FOOTER_CONTACT}</h4>
+                    <ul className="space-y-4 text-sm text-textSecondary font-medium">
+                        <li className="hover:text-primary transition-colors cursor-pointer">support@eventsphere.com</li>
+                        <li className="hover:text-primary transition-colors cursor-pointer">Twitter @EventSphere</li>
                     </ul>
                 </div>
             </div>
-            <div className="border-t border-border mt-12 pt-8 text-center text-textSecondary text-sm">
-                 &copy; {new Date().getFullYear()} {UI_TEXT.FOOTER_COPYRIGHT}
+            <div className="border-t border-border mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-textSecondary text-sm font-medium">
+                 <div>&copy; {new Date().getFullYear()} {UI_TEXT.FOOTER_COPYRIGHT}</div>
+                 <div className="flex gap-8">
+                     <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+                     <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
+                 </div>
             </div>
         </div>
       </footer>

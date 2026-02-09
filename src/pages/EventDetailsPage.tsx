@@ -1,5 +1,5 @@
-import { Suspense, useMemo } from 'react';
-import { useParams, useLoaderData, Await } from 'react-router-dom';
+import { Suspense, useMemo, useEffect } from 'react';
+import { useParams, useLoaderData, Await, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, Calendar, MapPin, Camera, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 import RSVPButton from '../components/rsvp/RSVPButton';
@@ -7,6 +7,8 @@ import CommentSection from '../features/comment/CommentSection';
 import EventMap from '../components/event-card/EventMap';
 import ImageUpload from '../components/upload/ImageUpload';
 import { useEventDetails } from '../hooks/useEventDetails';
+import { useAuth } from '../hooks/useAuth';
+import { ROUTES } from '../constants/routes';
 import { UI_TEXT, BUTTON_TEXT, DATE_FORMATS } from '../constants/text.constants';
 import type { IEvent } from '../types/event.types';
 import SEO from '../components/system/SEO';
@@ -14,6 +16,17 @@ import SEO from '../components/system/SEO';
 const EventDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
     const loaderData = useLoaderData() as { event: Promise<IEvent | null> };
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate(`${ROUTES.LOGIN}?redirect=${location.pathname}`);
+        }
+    }, [isAuthenticated, navigate, location.pathname]);
+
+    if (!isAuthenticated) return null;
 
     return (
         <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>}>

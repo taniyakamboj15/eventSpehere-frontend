@@ -43,6 +43,20 @@ export interface ICommunity {
     createdAt: string;
     updatedAt: string;
 }
+export interface CommunityMembersListProps {
+    members: IUser[];
+    isLoading: boolean;
+    isAdmin: boolean;
+    currentUser: IUser | null;
+    onRemove: (id: string) => void;
+}
+
+export interface CommunityMemberItemProps {
+    member: IUser;
+    isAdmin: boolean;
+    isCurrentUser: boolean;
+    onRemove: (id: string) => void;
+}
 
 export interface CommunityLoaderData {
   community: ICommunity;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search } from 'lucide-react';
 import CommunityMemberItem from './CommunityMemberItem';
 import { UI_TEXT } from '../../constants/text.constants';
-import type { CommunityMembersListProps } from './types';
+import type { CommunityMembersListProps } from '../../types/community.types';
 
 const CommunityMembersList = ({ members, isLoading, isAdmin, currentUser, onRemove }: CommunityMembersListProps) => {
     const [searchTerm, setSearchTerm] = useState('');

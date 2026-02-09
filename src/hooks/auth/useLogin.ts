@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSchema } from '../../validators/auth.schema';
 import { type LoginDTO } from '../../services/api/auth.api';
@@ -10,6 +10,8 @@ import { useActionForm } from '../utils/useActionForm';
 export const useLogin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirectTo = searchParams.get('redirect');
     
     const { form, serverError, onSubmit, actionData } = useActionForm<LoginDTO>(
         loginSchema, 
@@ -22,9 +24,9 @@ export const useLogin = () => {
                 user: actionData.user, 
                 accessToken: actionData.accessToken || '' 
             }));
-            navigate(ROUTES.DASHBOARD);
+            navigate(redirectTo || ROUTES.DASHBOARD);
         }
-    }, [actionData, dispatch, navigate]);
+    }, [actionData, dispatch, navigate, redirectTo]);
 
     return { form, serverError, onSubmit };
 };
