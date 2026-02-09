@@ -1,13 +1,16 @@
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import EventCard from '../components/EventCard';
-import Button from '../components/Button';
-import { Loader2, Users, Lock, Globe, Briefcase, Plus } from 'lucide-react';
-import CommunityMembersModal from '../components/CommunityMembersModal';
+import { useNavigate, useLoaderData } from 'react-router-dom';
+import EventCard from '../components/event-card/EventCard';
+import Button from '../components/common/Button';
+import { Users, Lock, Globe, Briefcase, Plus } from 'lucide-react';
+import CommunityMembersModal from '../components/community-modal/CommunityMembersModal';
 import { useCommunityDetails } from '../hooks/useCommunityDetails';
+import type { CommunityLoaderData } from '../types/community.types';
+import { BUTTON_TEXT } from '../constants/text.constants';
+import StatusHandler from '../components/common/StatusHandler';
+
 
 const CommunityDetailsPage = () => {
-    const { id } = useParams<{ id: string }>();
+    const loaderData = useLoaderData() as CommunityLoaderData;
     const navigate = useNavigate();
     const { 
         community, 
@@ -20,41 +23,41 @@ const CommunityDetailsPage = () => {
         handleLeave, 
         isMember, 
         isAdmin 
-    } = useCommunityDetails(id);
-
-    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
-    if (!community) return <div className="text-center py-20">Community not found</div>;
+    } = useCommunityDetails(loaderData.community?._id, loaderData);
 
     return (
         <div className="min-h-screen bg-gray-50/50">
-             {/* Banner */}
-             <div className="h-48 md:h-64 bg-slate-900 relative overflow-hidden flex items-center justify-center">
-                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20" />
-                 <h1 className="relative z-10 text-4xl md:text-5xl font-black text-white px-4 text-center">
-                     {community.name}
-                 </h1>
-             </div>
+             <StatusHandler isLoading={isLoading} isEmpty={!community} emptyTitle="Community not found">
+                 {community && (
+                     <>
+                        {/* Banner */}
+                        <div className="h-48 md:h-64 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20" />
+                            <h1 className="relative z-10 text-4xl md:text-5xl font-black text-white px-4 text-center">
+                                {community.name}
+                            </h1>
+                        </div>
 
-             <div className="container mx-auto px-4 -mt-10 relative z-20 pb-12">
-                 <div className="max-w-4xl mx-auto">
-                     <div className="bg-surface rounded-3xl p-8 border border-border shadow-lg mb-8">
-                         <div className="flex flex-wrap items-center justify-between gap-6 mb-6">
-                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-primary/10 rounded-xl text-primary">
-                                    {community.type === 'NEIGHBORHOOD' && <Lock className="w-6 h-6" />}
-                                    {community.type === 'HOBBY' && <Globe className="w-6 h-6" />}
-                                    {community.type === 'BUSINESS' && <Briefcase className="w-6 h-6" />}
-                                </div>
-                                <span className="font-bold text-textSecondary uppercase tracking-wider text-sm">{community.type}</span>
-                             </div>
-                             <button 
-                                onClick={() => setShowMembersModal(true)}
-                                className="flex items-center gap-2 text-textSecondary text-sm hover:text-primary transition-colors cursor-pointer"
-                             >
-                                 <Users className="w-4 h-4" />
-                                 <span className="font-bold">{community.members.length} Members</span>
-                             </button>
-                         </div>
+                        <div className="container mx-auto px-4 -mt-10 relative z-20 pb-12">
+                            <div className="max-w-4xl mx-auto">
+                                <div className="bg-surface rounded-3xl p-8 border border-border shadow-lg mb-8">
+                                    <div className="flex flex-wrap items-center justify-between gap-6 mb-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-3 bg-primary/10 rounded-xl text-primary">
+                                                {community.type === 'NEIGHBORHOOD' && <Lock className="w-6 h-6" />}
+                                                {community.type === 'HOBBY' && <Globe className="w-6 h-6" />}
+                                                {community.type === 'BUSINESS' && <Briefcase className="w-6 h-6" />}
+                                            </div>
+                                            <span className="font-bold text-textSecondary uppercase tracking-wider text-sm">{community.type}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => setShowMembersModal(true)}
+                                            className="flex items-center gap-2 text-textSecondary text-sm hover:text-primary transition-colors cursor-pointer"
+                                        >
+                                            <Users className="w-4 h-4" />
+                                            <span className="font-bold">{community.members.length} Members</span>
+                                        </button>
+                                    </div>
                          
                          <p className="text-lg text-text leading-relaxed whitespace-pre-wrap mb-8">
                              {community.description}
@@ -67,16 +70,16 @@ const CommunityDetailsPage = () => {
                                  variant={isMember ? "outline" : "primary"}
                                  className="px-8"
                              >
-                                 {isMember ? 'Leave Community' : 'Join Community'}
+                                 {isMember ? BUTTON_TEXT.LEAVE_COMMUNITY : BUTTON_TEXT.JOIN_COMMUNITY}
                              </Button>
                              
                              {isAdmin && (
                                  <Button 
-                                     onClick={() => navigate('/events/create', { state: { communityId: id } })}
+                                     onClick={() => navigate('/events/create', { state: { communityId: community._id } })}
                                      className="px-8 gap-2 bg-slate-900 text-white hover:bg-slate-800"
                                  >
                                      <Plus className="w-4 h-4" />
-                                     Create Event
+                                     {BUTTON_TEXT.CREATE_EVENT}
                                  </Button>
                              )}
                          </div>
@@ -99,11 +102,13 @@ const CommunityDetailsPage = () => {
              
              {showMembersModal && (
                  <CommunityMembersModal 
-                    communityId={id!} 
+                    communityId={community._id} 
                     onClose={() => setShowMembersModal(false)}
-                    isAdmin={isAdmin}
                  />
              )}
+                     </>
+                 )}
+             </StatusHandler>
         </div>
     );
 };

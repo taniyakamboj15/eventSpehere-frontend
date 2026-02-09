@@ -1,4 +1,4 @@
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAttendeeDashboard } from '../../hooks/user/useAttendeeDashboard';
@@ -6,7 +6,9 @@ import { UI_TEXT } from '../../constants/text.constants';
 import { JoinedEventsList } from './JoinedEventsList';
 import { UpgradeOrganizerCard } from './UpgradeOrganizerCard';
 
-export const AttendeeDashboard = () => {
+import type { AttendeeDashboardProps } from '../../types/dashboard.types';
+
+export const AttendeeDashboard = ({ initialData }: AttendeeDashboardProps) => {
     const navigate = useNavigate();
     const {
         user,
@@ -14,7 +16,7 @@ export const AttendeeDashboard = () => {
         myRsvps,
         loadingRsvps,
         handleUpgradeRequest
-    } = useAttendeeDashboard();
+    } = useAttendeeDashboard(initialData);
 
     // 1. Pending State View
     if (user?.upgradeStatus === 'PENDING') {

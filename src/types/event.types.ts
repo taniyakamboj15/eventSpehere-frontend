@@ -52,3 +52,12 @@ export interface IEvent {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface EventImageProps {
+    event: IEvent;
+    isJoined?: boolean;
+}
+
+export interface EventInfoProps {
+    event: IEvent;
+}

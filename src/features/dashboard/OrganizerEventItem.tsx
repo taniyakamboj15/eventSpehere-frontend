@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Calendar, ScanLine } from 'lucide-react';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import type { IEvent } from '../../types/event.types';
 import { UI_TEXT } from '../../constants/text.constants';
 

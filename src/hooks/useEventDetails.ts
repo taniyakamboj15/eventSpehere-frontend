@@ -1,17 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { eventApi } from '../services/api/event.api';
 import type { IEvent } from '../types/event.types';
-import type { ICommunity } from '../types/community.types';
-import { useAuth } from './useAuth';
 import { toast } from 'react-hot-toast';
 import { RsvpStatus } from '../types/rsvp.types';
+import { usePermissions } from './utils/usePermissions';
 
-export const useEventDetails = (id: string | undefined) => {
-    const { user } = useAuth();
-    const [event, setEvent] = useState<IEvent | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [userRsvpStatus, setUserRsvpStatus] = useState<RsvpStatus | undefined>(undefined);
+export const useEventDetails = (id: string | undefined, initialData?: IEvent | null) => {
+    const [event, setEvent] = useState<IEvent | null>(initialData || null);
+    const [isLoading, setIsLoading] = useState(!initialData);
+    const [userRsvpStatus, setUserRsvpStatus] = useState<RsvpStatus | undefined>(initialData?.userRsvpStatus || undefined);
     const [imageError, setImageError] = useState(false);
+    
+    const { getEventPermissions } = usePermissions();
 
     const fetchEvent = useCallback(async () => {
         if (!id) return;
@@ -24,19 +24,19 @@ export const useEventDetails = (id: string | undefined) => {
             }
         } catch (error) {
             console.error('Failed to load event', error);
-            toast.error('Failed to load event details');
         } finally {
             setIsLoading(false);
         }
     }, [id]);
 
     useEffect(() => {
-        fetchEvent();
-    }, [fetchEvent]);
+        if (!initialData) {
+            fetchEvent();
+        }
+    }, [fetchEvent, initialData]);
 
     const handleRsvpChange = useCallback((status: RsvpStatus) => {
         setUserRsvpStatus(status);
-        // Optimistic update
         setEvent(prev => {
             if (!prev) return null;
             let countChange = 0;
@@ -67,12 +67,8 @@ export const useEventDetails = (id: string | undefined) => {
         }
     }, [event]);
 
-    // Permissions logic
-    const isEventEnded = event ? new Date() > new Date(event.endDateTime) : false;
-    const isOrganizer = event && user && (typeof event.organizer === 'string' ? event.organizer === user.id : event.organizer._id === user.id);
-    const isCommunityAdmin = event && user && user.id && event.community && typeof event.community !== 'string' && ('admins' in event.community) && ((event.community as unknown as ICommunity).admins?.includes(user.id));
-    const canManage = isOrganizer || isCommunityAdmin;
-    const isAttendee = userRsvpStatus === 'GOING';
+    // Delegated permissions
+    const permissions = useMemo(() => getEventPermissions(event, userRsvpStatus), [event, userRsvpStatus, getEventPermissions]);
 
     return {
         event,
@@ -84,11 +80,6 @@ export const useEventDetails = (id: string | undefined) => {
         handleRsvpChange,
         scrollToMap,
         handlePhotoUpload,
-        permissions: {
-            canManage,
-            canUpload: event && isEventEnded && (canManage || isAttendee),
-            isOrganizer,
-            isEventEnded
-        }
+        permissions
     };
 };

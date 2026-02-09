@@ -1,4 +1,4 @@
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { Check, X, Loader2 } from 'lucide-react';
 import { UI_TEXT } from '../../constants/text.constants';
 import { useAdminDashboard } from '../../hooks/admin/useAdminDashboard';

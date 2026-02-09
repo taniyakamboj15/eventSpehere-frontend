@@ -1,7 +1,7 @@
 import { Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROUTES } from '../constants/routes';
-import Button from '../components/Button';
+import Button from '../components/common/Button';
 import { Calendar, Users, Sparkles, Menu, X, LogOut, Shield, Search } from 'lucide-react';
 import React from 'react';
 import { UI_TEXT } from '../constants/text.constants';

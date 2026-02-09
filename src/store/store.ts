@@ -4,8 +4,6 @@ import authReducer from './authSlice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // event: eventReducer,
-    // community: communityReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

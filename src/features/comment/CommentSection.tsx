@@ -1,15 +1,13 @@
 import type { IComment } from '../../types/comment.types';
 import { UserRole } from '../../types/auth.types';
-import Button from '../../components/Button';
-import Textarea from '../../components/Textarea';
+import Button from '../../components/common/Button';
+import Textarea from '../../components/forms/Textarea';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useComments } from '../../hooks/comment/useComments';
 import { UI_TEXT } from '../../constants/text.constants';
 
-interface CommentSectionProps {
-    eventId: string;
-}
+import type { CommentSectionProps } from '../../types/comment.types';
 
 const CommentSection = ({ eventId }: CommentSectionProps) => {
     const {
@@ -98,7 +96,7 @@ const CommentSection = ({ eventId }: CommentSectionProps) => {
                         </div>
                         <div className="flex-1">
                             <Textarea 
-                                label="Leave a comment" 
+                                label={UI_TEXT.LABEL_LEAVE_COMMENT} 
                                 name="content" 
                                 register={register}
                                 placeholder={UI_TEXT.COMMENT_PLACEHOLDER}

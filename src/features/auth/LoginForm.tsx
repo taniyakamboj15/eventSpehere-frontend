@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+import Input from '../../components/forms/Input';
+import Button from '../../components/common/Button';
 import { useLogin } from '../../hooks/auth/useLogin';
 import { UI_TEXT } from '../../constants/text.constants';
 

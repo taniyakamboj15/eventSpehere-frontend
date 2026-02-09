@@ -1,15 +1,9 @@
-import React from 'react';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { UI_TEXT, DATE_FORMATS } from '../../constants/text.constants';
-import type { IEvent } from '../../types/event.types';
+import type { EventInfoProps } from '../../types/event.types';
 
-interface EventInfoProps {
-    event: IEvent;
-}
-
-const EventInfo: React.FC<EventInfoProps> = ({ event }) => {
-    // Check if community is populated object
+const EventInfo = ({ event }: EventInfoProps) => {
     const communityName = typeof event.community === 'object' ? event.community?.name : null;
 
     return (
@@ -18,7 +12,7 @@ const EventInfo: React.FC<EventInfoProps> = ({ event }) => {
                 {communityName && (
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wide">
                         <Users className="w-3 h-3" />
-                         Hosted by {communityName}
+                         {UI_TEXT.HOSTED_BY} {communityName}
                     </div>
                 )}
                 <h3 className="text-xl font-bold text-text group-hover:text-primary transition-colors line-clamp-2 leading-tight">
@@ -43,10 +37,8 @@ const EventInfo: React.FC<EventInfoProps> = ({ event }) => {
 
             <div className="flex items-center justify-between pt-4 border-t border-border/60">
                 <div className="flex items-center gap-2">
-                    <div className="flex -space-x-2">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 border-2 border-surface flex items-center justify-center text-[10px] text-primary font-bold">
-                            {event.attendeeCount > 0 ? event.attendeeCount : '0'}
-                        </div>
+                    <div className="w-7 h-7 rounded-full bg-primary/10 border-2 border-surface flex items-center justify-center text-[10px] text-primary font-bold">
+                        {event.attendeeCount || 0}
                     </div>
                     <span className="text-xs font-medium text-textSecondary">{event.attendeeCount} {UI_TEXT.GOING_COUNT_SUFFIX}</span>
                 </div>

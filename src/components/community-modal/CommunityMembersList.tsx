@@ -1,17 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
-import type { IUser } from '../../types/auth.types';
 import CommunityMemberItem from './CommunityMemberItem';
+import { UI_TEXT } from '../../constants/text.constants';
+import type { CommunityMembersListProps } from './types';
 
-interface CommunityMembersListProps {
-    members: IUser[];
-    isLoading: boolean;
-    isAdmin: boolean;
-    currentUser: IUser | null;
-    onRemove: (id: string) => void;
-}
-
-const CommunityMembersList: React.FC<CommunityMembersListProps> = ({ members, isLoading, isAdmin, currentUser, onRemove }) => {
+const CommunityMembersList = ({ members, isLoading, isAdmin, currentUser, onRemove }: CommunityMembersListProps) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredMembers = searchTerm 
@@ -27,7 +20,7 @@ const CommunityMembersList: React.FC<CommunityMembersListProps> = ({ members, is
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input 
                     type="text" 
-                    placeholder="Search members..." 
+                    placeholder={UI_TEXT.SEARCH_MEMBERS_PLACEHOLDER} 
                     className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -35,7 +28,7 @@ const CommunityMembersList: React.FC<CommunityMembersListProps> = ({ members, is
             </div>
 
             {isLoading ? (
-                <div className="text-center py-8">Loading...</div>
+                <div className="text-center py-8">{UI_TEXT.Loading}</div>
             ) : (
                 <div className="space-y-3">
                     {filteredMembers.map(member => (
@@ -48,7 +41,7 @@ const CommunityMembersList: React.FC<CommunityMembersListProps> = ({ members, is
                         />
                     ))}
                     {filteredMembers.length === 0 && (
-                        <div className="text-center py-4 text-gray-500 text-sm">No members found</div>
+                        <div className="text-center py-4 text-gray-500 text-sm">{UI_TEXT.NO_MEMBERS_FOUND}</div>
                     )}
                 </div>
             )}

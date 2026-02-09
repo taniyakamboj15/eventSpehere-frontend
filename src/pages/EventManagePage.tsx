@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
 import EventForm from '../features/event/EventForm';
 import AttendeeManager from '../features/rsvp/AttendeeManager';
-import Button from '../components/Button';
-import { Loader2, ArrowLeft, Edit, Users } from 'lucide-react';
 import { useEventManage } from '../hooks/useEventManage';
+import StatusHandler from '../components/common/StatusHandler';
+import EntityHeader from '../components/common/EntityHeader';
+import Button from '../components/common/Button';
+import { Edit, Users } from 'lucide-react';
 
 const EventManagePage = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,30 +17,27 @@ const EventManagePage = () => {
         showDeleteModal, 
         setShowDeleteModal, 
         isDeleting, 
-        handleDelete, 
-        navigate 
+        handleDelete
     } = useEventManage(id);
-
-    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
-    if (!event) return <div className="text-center py-20">Event not found</div>;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <Button variant="ghost" className="mb-6 pl-0 gap-2 hover:bg-transparent" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-            </Button>
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
-                    <span className="text-sm font-bold text-primary uppercase tracking-wider mb-1 block">Manage Event</span>
-                    <h1 className="text-3xl font-black text-text">{event.title}</h1>
-                </div>
-                <div className="flex gap-3">
-                     <Button variant="outline" onClick={() => window.open(`/events/${event._id}`, '_blank')}>
-                        View Live Page
-                     </Button>
-                </div>
-            </div>
+            <StatusHandler isLoading={isLoading} isEmpty={!event} emptyTitle="Event not found">
+                {event && (
+                    <>
+                        <EntityHeader 
+                            label="Manage Event"
+                            title={event.title}
+                            backUrl={-1}
+                            backLabel="Back to Dashboard"
+                            actions={[
+                                {
+                                    label: 'View Live Page',
+                                    onClick: () => window.open(`/events/${event._id}`, '_blank'),
+                                    variant: 'outline'
+                                }
+                            ]}
+                        />
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Sidebar Navigation */}
@@ -64,14 +63,14 @@ const EventManagePage = () => {
                         <Users className="w-4 h-4" /> Attendees
                     </button>
                    
-                   {/* Danger Zone */}
+                   {/* delete */}
                     <div className="pt-6 mt-6 border-t border-border">
                         <p className="px-2 text-xs font-bold text-textSecondary uppercase mb-2">Danger Zone</p>
                         <button
                             onClick={() => setShowDeleteModal(true)}
                             className="w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 transition-all flex items-center gap-3"
                         >
-                            Delete Event
+                            Delete
                         </button>
                     </div>
                 </div>
@@ -113,6 +112,9 @@ const EventManagePage = () => {
                     </div>
                 </div>
             )}
+                    </>
+                )}
+            </StatusHandler>
         </div>
     );
 };

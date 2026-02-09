@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import type { IUser } from '../../types/auth.types';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { Check, Loader2 } from 'lucide-react';
 import { UI_TEXT, BUTTON_TEXT } from '../../constants/text.constants';
 import { useAttendeeManager } from '../../hooks/rsvp/useAttendeeManager';
@@ -11,12 +12,14 @@ interface AttendeeManagerProps {
 const AttendeeManager = ({ eventId: propEventId }: AttendeeManagerProps) => {
     const { attendees, isLoading, checkInLoading, fetchAttendees, handleCheckIn } = useAttendeeManager({ eventId: propEventId });
 
+    const attendeeCount = useMemo(() => attendees.length, [attendees.length]);
+
     if (isLoading) return <Loader2 className="animate-spin" />;
 
     return (
         <div className="bg-surface rounded-xl border border-border overflow-hidden">
              <div className="p-4 border-b border-border bg-gray-50 flex justify-between items-center">
-                <h3 className="font-semibold text-text">{UI_TEXT.ATTENDEE_LIST_HEADER} ({attendees.length})</h3>
+                <h3 className="font-semibold text-text">{UI_TEXT.ATTENDEE_LIST_HEADER} ({attendeeCount})</h3>
                 <Button size="sm" variant="outline" onClick={fetchAttendees}>{UI_TEXT.REFRESH_BUTTON}</Button>
             </div>
             <div className="divide-y divide-border">
@@ -51,7 +54,7 @@ const AttendeeManager = ({ eventId: propEventId }: AttendeeManagerProps) => {
                         </div>
                     );
                 })}
-                {attendees.length === 0 && (
+                {attendeeCount === 0 && (
                      <div className="p-8 text-center text-textSecondary text-sm">
                          {UI_TEXT.NO_ATTENDEES}
                      </div>

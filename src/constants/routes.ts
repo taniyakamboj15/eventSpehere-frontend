@@ -8,4 +8,5 @@ export const ROUTES = {
   VERIFY_EMAIL: '/verify-email',
   EVENT_DETAILS: (id: string = ':id') => `/events/${id}`,
   CHECK_IN: (id: string = ':id') => `/events/${id}/checkin`,
+  CREATE_COMMUNITY: '/communities/create',
 };

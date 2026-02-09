@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { ERROR_MESSAGES } from '../constants/text.constants';
 import { Check } from 'lucide-react';
-import React from 'react';
+// React removed
 
 interface UseTicketScannerProps {
     eventId: string;

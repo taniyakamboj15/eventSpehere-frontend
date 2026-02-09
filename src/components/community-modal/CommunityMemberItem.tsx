@@ -1,15 +1,8 @@
-import React from 'react';
 import { UserMinus } from 'lucide-react';
-import type { IUser } from '../../types/auth.types';
+import { BUTTON_TEXT } from '../../constants/text.constants';
+import type { CommunityMemberItemProps } from './types';
 
-interface CommunityMemberItemProps {
-    member: IUser;
-    isAdmin: boolean;
-    isCurrentUser: boolean;
-    onRemove: (id: string) => void;
-}
-
-const CommunityMemberItem: React.FC<CommunityMemberItemProps> = ({ member, isAdmin, isCurrentUser, onRemove }) => {
+const CommunityMemberItem = ({ member, isAdmin, isCurrentUser, onRemove }: CommunityMemberItemProps) => {
     // Handle both _id and id
     const memberId = member._id || member.id;
     if (!memberId) return null;
@@ -29,7 +22,7 @@ const CommunityMemberItem: React.FC<CommunityMemberItemProps> = ({ member, isAdm
                 <button 
                     onClick={() => onRemove(memberId)}
                     className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all rounded-lg hover:bg-red-50"
-                    title="Remove Member"
+                    title={BUTTON_TEXT.REMOVE_MEMBER}
                 >
                     <UserMinus className="w-4 h-4" />
                 </button>

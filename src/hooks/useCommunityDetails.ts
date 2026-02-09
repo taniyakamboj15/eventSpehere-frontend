@@ -1,49 +1,52 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './useAuth';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { communityApi } from '../services/api/community.api';
 import type { ICommunity } from '../types/community.types';
 import type { IEvent } from '../types/event.types';
+import type { IUser } from '../types/auth.types';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
+import { usePermissions } from './utils/usePermissions';
 
-export const useCommunityDetails = (id: string | undefined) => {
-    const { user } = useAuth();
-    const [community, setCommunity] = useState<ICommunity | null>(null);
-    const [events, setEvents] = useState<IEvent[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface CommunityLoaderData {
+    community: ICommunity;
+    events: IEvent[];
+    members: { members: IUser[], admins: IUser[] };
+}
+
+export const useCommunityDetails = (id: string | undefined, initialData?: CommunityLoaderData) => {
+    const [community, setCommunity] = useState<ICommunity | null>(initialData?.community || null);
+    const [events, setEvents] = useState<IEvent[]>(initialData?.events || []);
+    const [members, setMembers] = useState<IUser[]>(initialData?.members?.members || []);
+    const [isLoading, setIsLoading] = useState(!initialData);
     const [isJoining, setIsJoining] = useState(false);
     const [showMembersModal, setShowMembersModal] = useState(false);
+    const [isModifying, setIsModifying] = useState(false);
+    
+    const { getCommunityPermissions, user } = usePermissions();
 
     const fetchData = useCallback(async () => {
         if (!id) return;
+        if (initialData) {
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            // Optimization: API should ideally have getById, but sticking to existing pattern for now or improving it?
-            // Existing pattern: getAll then find. Let's fix this if API supports it.
-            // Checking community.api.ts... Assuming getById might not exist or we optimize. 
-            // Actually, best to stick to current logic to avoid breaking if backend doesn't support getById direct route (though it should).
-            // Let's assume standard REST: getById is better. But let's check current 'communityApi.getAll()' use.
-            // If getById exists, use it. If not, fallback.
-            // For now, mirroring existing logic to be safe, but typically getById is preferred.
+            const found = await communityApi.getById(id);
+            setCommunity(found);
             
-            // Wait, let's verify if `getById` exists in `community.api.ts`? 
-            // I don't see `community.api.ts` content. I'll stick to the logic I saw in `CommunityDetailsPage.tsx`: getAll().find()
-            // It's inefficient but safe without viewing api file.
-            
-            const all = await communityApi.getAll(); 
-            const found = all.find((c: ICommunity) => c._id === id);
-            setCommunity(found || null);
-            
-            if (found) {
-                const communityEvents = await communityApi.getEvents(id);
-                setEvents(communityEvents);
-            }
+            const communityEvents = await communityApi.getEvents(id);
+            setEvents(communityEvents);
+
+            const membersData = await communityApi.getMembers(id);
+            setMembers(membersData.members);
         } catch (error) {
             console.error(error);
             toast.error('Failed to load community details');
         } finally {
             setIsLoading(false);
         }
-    }, [id]);
+    }, [id, initialData]);
 
     useEffect(() => {
         fetchData();
@@ -65,7 +68,7 @@ export const useCommunityDetails = (id: string | undefined) => {
              } else {
                  toast.error('Failed to join');
              }
-            setIsJoining(false);
+             setIsJoining(false);
         }
     }, [id, user]);
 
@@ -82,16 +85,41 @@ export const useCommunityDetails = (id: string | undefined) => {
              } else {
                 toast.error('Failed to leave');
              }
-            setIsJoining(false);
+             setIsJoining(false);
         }
     }, [id, user]);
 
-    const isMember = community && user && user.id ? community.members.includes(user.id) : false;
-    const isAdmin = community && user && user.id ? community.admins.includes(user.id) : false;
+    const handleRemoveMember = useCallback(async (memberId: string) => {
+        if (!id || !user) return;
+        setIsModifying(true);
+        try {
+            await communityApi.removeMember(id, memberId);
+            toast.success('Member removed');
+            setCommunity(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    members: prev.members.filter((m: any) => (m._id || m.id || m) !== memberId)
+                };
+            });
+        } catch (error: unknown) {
+             if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message || 'Failed to remove member');
+             } else {
+                toast.error('Failed to remove member');
+             }
+        } finally {
+            setIsModifying(false);
+        }
+    }, [id, user]);
+
+    const { isAdmin, isMember } = useMemo(() => getCommunityPermissions(community), [community, getCommunityPermissions]);
 
     return {
         community,
         events,
+        members,
         isLoading,
         isJoining,
         showMembersModal,
@@ -100,6 +128,8 @@ export const useCommunityDetails = (id: string | undefined) => {
         handleLeave,
         isMember,
         isAdmin,
-        user
+        user,
+        handleRemoveMember,
+        isModifying
     };
 };

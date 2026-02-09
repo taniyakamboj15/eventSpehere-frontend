@@ -1,11 +1,8 @@
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
 import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { communityApi } from '../services/api/community.api';
 import { CommunityType } from '../types/community.types';
 import { ROUTES } from '../constants/routes';
+
+import { useActionForm } from './utils/useActionForm';
 
 const schema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -24,26 +21,19 @@ interface CreateCommunityForm {
 }
 
 export const useCreateCommunity = () => {
-    const navigate = useNavigate();
-    const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } = useForm<CreateCommunityForm>({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            type: CommunityType.HOBBY,
-            latitude: 51.505,
-            longitude: -0.09
+    const { form, serverError, onSubmit } = useActionForm<CreateCommunityForm>(
+        schema as any,
+        ROUTES.CREATE_COMMUNITY,
+        {
+            defaultValues: {
+                type: CommunityType.HOBBY,
+                latitude: 51.505,
+                longitude: -0.09
+            }
         }
-    });
+    );
 
-    const onSubmit = async (data: CreateCommunityForm) => {
-        try {
-            await communityApi.create(data);
-            toast.success('Community created successfully!');
-            navigate(ROUTES.DASHBOARD);
-        } catch (error) {
-            toast.error('Failed to create community');
-            console.error(error);
-        }
-    };
+    const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } = form;
 
     return {
         register,
@@ -53,6 +43,7 @@ export const useCreateCommunity = () => {
         watch,
         errors,
         isSubmitting,
+        serverError,
         onSubmit,
         CommunityType
     };

@@ -27,3 +27,8 @@ export interface INotification {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface NotificationItemProps {
+    notification: INotification;
+    onClick: (notification: INotification) => void;
+}

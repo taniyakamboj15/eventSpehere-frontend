@@ -1,4 +1,3 @@
-// ... previous content
 
 export const BUTTON_TEXT = {
      // ... existing
@@ -14,15 +13,18 @@ export const BUTTON_TEXT = {
     ADD_TO_CALENDAR: 'Add to Calendar',
     SAVE_CHANGES: 'Save Changes',
     CREATE_EVENT: 'Create Event',
+    SEND_INVITATION: 'Send Invitation',
+    SENDING: 'Sending...',
+    REMOVE_MEMBER: 'Remove Member',
 };
 
 export const ERROR_MESSAGES = {
-    // ... existing
+   
     RSVP_FAILED: 'Failed to update RSVP',
     IMAGE_LOAD_FAILED: 'Failed to load image',
     GENERIC_ERROR: 'An unexpected error occurred',
     NOT_FOUND: 'Resource not found',
-    // New
+   
     CHECK_IN_SUCCESS: 'Check-in Successful!',
     TICKET_VALID: 'Ticket valid.',
     INVALID_TICKET: 'Invalid Ticket',
@@ -30,6 +32,12 @@ export const ERROR_MESSAGES = {
     EVENT_UPDATED: 'Event updated successfully!',
     EVENT_CREATED: 'Event created successfully!',
     COMMUNITY_LOAD_ERROR: 'Failed to load communities',
+    INVITE_FAILED: 'Failed to send invite',
+    MEMBER_REMOVE_SUCCESS: 'Member removed',
+    MEMBER_REMOVE_FAILED: 'Failed to remove member',
+    MEMBERS_LOAD_FAILED: 'Failed to load members',
+    EMAIL_INVALID: 'Invalid email',
+    EMAIL_REQUIRED: 'Email is required',
 };
 
 export const UI_TEXT = {
@@ -127,6 +135,16 @@ export const UI_TEXT = {
     NOTIFICATIONS_TITLE: 'Notifications',
     MARK_ALL_READ: 'Mark all read',
     NO_NOTIFICATIONS: 'No notifications yet',
+    MEMBERS_TAB: 'Members',
+    INVITE_TAB: 'Invite People',
+    SEARCH_MEMBERS_PLACEHOLDER: 'Search members...',
+    NO_MEMBERS_FOUND: 'No members found',
+    COMMUNITY_PEOPLE_TITLE: 'Community People',
+    INVITE_PEOPLE_HINT: 'Invite people to your community via email. They will receive an email invitation and an in-app notification if they are already registered.',
+    MAP_CLICK_PROMPT: 'Click on the map to set event location',
+    OPEN_IN_GOOGLE_MAPS: 'Open in Google Maps',
+    HOSTED_BY: 'Hosted by',
+    INVITATION_SENT_TO: 'Invitation sent to',
     // Layout
     BRAND_NAME: 'EventSphere',
     NAV_DISCOVER: 'Discover',
@@ -245,6 +263,36 @@ export const UI_TEXT = {
     AUTH_VERIFY_FAILED: 'Verification failed',
     AUTH_UNEXPECTED_ERROR: 'An unexpected error occurred',
 
+    // Form Labels
+    LABEL_FULL_NAME: 'Full Name',
+    LABEL_EMAIL_ADDRESS: 'Email Address',
+    LABEL_COMMUNITY_NAME: 'Community Name',
+    LABEL_TYPE: 'Type',
+    LABEL_DESCRIPTION: 'Description',
+    LABEL_LEAVE_COMMENT: 'Leave a comment',
+    
+    // Placeholders
+    PLACEHOLDER_COMMUNITY_NAME: 'e.g. Downtown Runners, Elm Street Neighbors',
+    PLACEHOLDER_COMMUNITY_DESC: 'What is this community about?',
+    PLACEHOLDER_SEARCH_AREA: "Search area (e.g. 'Central Park, NY')",
+    PLACEHOLDER_SEARCH_MEMBERS: 'Search members...',
+    PLACEHOLDER_FRIEND_EMAIL: 'friend@example.com',
+    
+    // Titles
+    TITLE_DASHBOARD_SEO: 'Dashboard | EventSphere',
+    TITLE_REMOVE_MEMBER: 'Remove Member',
+    TITLE_START_COMMUNITY: 'Start a Community',
+    SUBTITLE_START_COMMUNITY: 'Create a space for your neighborhood, hobby group, or business.',
+    LABEL_LOCATION_CENTER: 'Location Center',
+    LABEL_FIND_LOCATION: 'Find',
+    LABEL_SEARCHING: 'Searching...',
+    MSG_LOCATION_FOUND: 'Location found',
+    MSG_LOCATION_NOT_FOUND: 'Location not found',
+    MSG_LOCATION_REQUIRED: 'Location is required',
+    LABEL_NEIGHBORHOOD_PRIVATE: 'Neighborhood (Private)',
+    LABEL_HOBBY_PUBLIC: 'Hobby/Interest (Public)',
+    LABEL_BUSINESS_PROMOTIONAL: 'Local Business (Promotional)',
+
     // Community
     COMMUNITY_LOADING: 'Finding communities near you...',
     COMMUNITY_EMPTY: 'No communities found. Be the first to start one!',
@@ -255,6 +303,9 @@ export const UI_TEXT = {
     COMMUNITY_JOINED_BADGE: '✅ Joined',
     COMMUNITY_VIEW_DETAILS: 'View Details',
     COMMUNITY_JOIN: 'Join Community',
+    COMMUNITY_MEMBERS_TITLE: 'Community People',
+    MEMBERS_COUNT_SUFFIX: 'members',
+    CLOSE_LABEL: 'Close',
     
     // Event Items
     EVENT_ITEM_ONLINE: 'Online',
@@ -327,8 +378,6 @@ export const UI_TEXT = {
     PAST_EVENTS_TITLE: 'Recent Memories',
     PAST_EVENTS_SUBTITLE: 'See what our community has been up to.',
 };
-
-// ... existing DATE_FORMATS
 
 
 export const DATE_FORMATS = {

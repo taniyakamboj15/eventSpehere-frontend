@@ -1,36 +1,57 @@
-import { useParams } from 'react-router-dom';
+import { Suspense, useMemo } from 'react';
+import { useParams, useLoaderData, Await } from 'react-router-dom';
 import { Loader2, Calendar, MapPin, Camera, Settings } from 'lucide-react';
 import { format } from 'date-fns';
-import RSVPButton from '../components/RSVPButton';
+import RSVPButton from '../components/rsvp/RSVPButton';
 import CommentSection from '../features/comment/CommentSection';
-import EventMap from '../components/EventMap';
-import ImageUpload from '../components/ImageUpload';
+import EventMap from '../components/event-card/EventMap';
+import ImageUpload from '../components/upload/ImageUpload';
 import { useEventDetails } from '../hooks/useEventDetails';
 import { UI_TEXT, BUTTON_TEXT, DATE_FORMATS } from '../constants/text.constants';
+import type { IEvent } from '../types/event.types';
+import SEO from '../components/system/SEO';
 
 const EventDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
+    const loaderData = useLoaderData() as { event: Promise<IEvent | null> };
+
+    return (
+        <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>}>
+            <Await resolve={loaderData.event}>
+                {(event: IEvent | null) => {
+                    if (!event) return <div className="text-center py-20">{UI_TEXT.EVENT_NOT_FOUND}</div>;
+                    
+                    return <EventDetailsContent event={event} id={id!} />;
+                }}
+            </Await>
+        </Suspense>
+    );
+};
+
+const EventDetailsContent = ({ event, id }: { event: IEvent, id: string }) => {
     const { 
-        event, 
-        isLoading, 
-        userRsvpStatus, 
         imageError, 
         setImageError, 
-        handleRsvpChange, 
         scrollToMap, 
         handlePhotoUpload,
         permissions 
-    } = useEventDetails(id);
-
-    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>;
-    if (!event) return <div className="text-center py-20">{UI_TEXT.EVENT_NOT_FOUND}</div>;
+    } = useEventDetails(id, event);
 
     const { canManage, canUpload } = permissions;
-    const organizerName = typeof event.organizer === 'string' ? UI_TEXT.DEFAULT_ORGANIZER_NAME : event.organizer.name;
-    const organizerInitial = organizerName.charAt(0);
+    
+    const organizerName = useMemo(() => 
+        typeof event.organizer === 'string' ? UI_TEXT.DEFAULT_ORGANIZER_NAME : event.organizer.name,
+    [event.organizer]);
+
+    const organizerInitial = useMemo(() => organizerName.charAt(0), [organizerName]);
 
     return (
         <div className="min-h-screen bg-gray-50/50">
+            <SEO 
+                title={`${event.title} | EventSphere`}
+                description={event.description.slice(0, 160)}
+                ogImage={event.photos?.[0]}
+            />
             {/* Full-width Banner Header */}
             <div className="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
                 {event.photos && event.photos.length > 0 && !imageError ? (
@@ -192,10 +213,7 @@ const EventDetailsPage = () => {
                                     </a>
                                 )}
                                 <RSVPButton 
-                                    eventId={event._id} 
-                                    currentStatus={userRsvpStatus}
-                                    onStatusChange={handleRsvpChange}
-                                    isFull={event.attendeeCount >= event.capacity}
+                                    event={event}
                                 />
                                 
                                 {event.googleCalendarLink && (

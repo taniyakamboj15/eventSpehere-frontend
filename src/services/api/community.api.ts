@@ -13,6 +13,11 @@ export const communityApi = {
         return response.data.data;
     },
 
+    getById: async (id: string) => {
+        const response = await api.get<{ data: ICommunity }>(`/communities/${id}`);
+        return response.data.data;
+    },
+
     create: async (data: { name: string; type: CommunityType; description: string; latitude: number; longitude: number }) => {
         const response = await api.post<{ data: ICommunity }>('/communities', {
             ...data,

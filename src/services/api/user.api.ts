@@ -22,5 +22,10 @@ export const userApi = {
     rejectUpgrade: async (userId: string) => {
         const response = await api.post<ApiResponse<IUser>>(`/users/admin/upgrade-requests/${userId}/reject`);
         return response.data.data;
+    },
+    
+    updateProfile: async (data: { name: string; email: string }) => {
+        const response = await api.put<ApiResponse<IUser>>('/users/profile', data);
+        return response.data.data;
     }
 };

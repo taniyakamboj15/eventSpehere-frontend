@@ -3,10 +3,17 @@ import { useAuth } from './useAuth';
 import { eventApi } from '../services/api/event.api';
 import type { IEvent } from '../types/event.types';
 
-export const useOrganizerDashboard = () => {
+import type { ICommunity } from '../types/community.types';
+
+interface OrganizerDashboardData {
+    events: IEvent[];
+    communities: ICommunity[];
+}
+
+export const useOrganizerDashboard = (initialData?: OrganizerDashboardData) => {
   const { user } = useAuth();
-  const [events, setEvents] = useState<IEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [events, setEvents] = useState<IEvent[]>(initialData?.events || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [scanningEventId, setScanningEventId] = useState<string | null>(null);
 
   const fetchMyEvents = useCallback(async () => {

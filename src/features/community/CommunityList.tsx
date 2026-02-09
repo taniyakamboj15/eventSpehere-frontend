@@ -1,6 +1,6 @@
 import { MapPin, Users, Lock, Globe, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useCommunityList } from '../../hooks/community/useCommunityList';
 import { UI_TEXT } from '../../constants/text.constants';

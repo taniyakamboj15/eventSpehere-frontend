@@ -26,3 +26,10 @@ export interface AuthResponse {
   user: IUser;
   accessToken: string;
 }
+
+export interface AuthState {
+  user: IUser | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}

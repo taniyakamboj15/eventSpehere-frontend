@@ -1,5 +1,5 @@
 import { Sparkles, Users, Store } from 'lucide-react';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { UI_TEXT } from '../../constants/text.constants';
 
 interface UpgradeOrganizerCardProps {

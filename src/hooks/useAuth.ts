@@ -8,7 +8,7 @@ import { ROUTES } from '../constants/routes';
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, isLoading, accessToken } = useSelector((state: RootState) => state.auth);
 
   const signOut = async () => {
     try {
@@ -25,6 +25,7 @@ export const useAuth = () => {
     user,
     isAuthenticated,
     isLoading,
+    accessToken,
     signOut,
   };
 };

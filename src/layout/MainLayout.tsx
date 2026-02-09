@@ -1,8 +1,8 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROUTES } from '../constants/routes';
-import Button from '../components/Button';
-import NotificationDropdown from '../components/NotificationDropdown';
+import Button from '../components/common/Button';
+import NotificationDropdown from '../components/notification/NotificationDropdown';
 import { UI_TEXT } from '../constants/text.constants';
 
 const MainLayout = () => {

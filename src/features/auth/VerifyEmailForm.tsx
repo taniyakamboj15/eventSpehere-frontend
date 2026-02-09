@@ -1,4 +1,4 @@
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { useVerifyEmail } from '../../hooks/auth/useVerifyEmail';
 import { UI_TEXT } from '../../constants/text.constants';
 

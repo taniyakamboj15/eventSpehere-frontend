@@ -65,14 +65,14 @@ A modern, type-safe React application for managing community events, RSVPs, and 
 ```
 src/
 ├── components/     # Reusable UI components (Button, Input, Modal, etc.)
-├── constants/      # App-wide constants and config
+├── constants/      # App-wide constants (styles, buttons, text, maps)
 ├── features/       # Feature-specific components (EventForm, CommunityList)
 ├── hooks/          # Custom React hooks (useAuth, useDebounce)
 ├── layouts/        # Page layouts (MainLayout, AuthLayout)
 ├── pages/          # Route components
 ├── services/       # API services and Axios config
 ├── store/          # Redux store and slices
-├── types/          # TypeScript interfaces and types
+├── types/          # Centralized TypeScript definitions
 ├── validators/     # Yup schema definitions
 └── styles/         # Global styles and Tailwind config
 ```
@@ -86,7 +86,9 @@ npm run lint
 
 ## 📝 Recent Updates
 
-- **Strict Type Safety**: Refactored codebase to eliminate `any` types.
-- **Map Integration**: Replaced conditional rendering with Map-based patterns for better scalability.
-- **React 19 Compatibility**: Updated dependencies to support latest React features.
+- **Architectural Cleanup**: Refactored components to separate business logic, UI styles, and type definitions.
+- **Centralized Type Management**: Consolidated all component interfaces into `src/types` to ensure project-wide consistency and reusability.
+- **Logic Refactoring**: Replaced complex ternary operators and conditional logic with efficient lookup maps for UI states and component styles.
+- **Shared Constants**: Extracted UI variants and common styles into `src/constants/style.constants.ts` and `src/constants/button.constants.ts`.
+- **Strict Type Safety**: Eliminated `any` types across critical paths and optimized component memoization.
 

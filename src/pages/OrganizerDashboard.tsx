@@ -1,21 +1,25 @@
 import { useEffect, useState, useCallback } from 'react';
 import { communityApi } from '../services/api/community.api'; 
-import Button from '../components/Button';
-import { TicketScanner } from '../components/TicketScanner';
+import Button from '../components/common/Button';
+import { TicketScanner } from '../components/scanner/TicketScanner';
 import { OrganizerEventItem } from '../features/dashboard/OrganizerEventItem';
 import { Loader2, Plus, Calendar, Globe, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import { useOrganizerDashboard } from '../hooks/useOrganizerDashboard';
 
-const OrganizerDashboard = () => {
+import type { OrganizerDashboardProps } from '../types/dashboard.types';
+import type { ICommunity } from '../types/community.types';
+import { BUTTON_TEXT, UI_TEXT } from '../constants/text.constants';
+
+const OrganizerDashboard = ({ initialData }: OrganizerDashboardProps) => {
   const navigate = useNavigate();
   const { 
     events, 
     isLoading, 
     scanningEventId, 
     setScanningEventId 
-  } = useOrganizerDashboard();
+  } = useOrganizerDashboard(initialData);
   
   const handleScan = useCallback((id: string) => {
       setScanningEventId(id);
@@ -39,7 +43,7 @@ const OrganizerDashboard = () => {
                     size="sm"
                     onClick={() => navigate('/communities/create')}
                 >
-                    + Create Community
+                    + {BUTTON_TEXT.JOIN_COMMUNITY}
                 </Button>
             </div>
             <Calendar className="absolute right-6 bottom-6 w-12 h-12 text-white/20" />
@@ -51,9 +55,9 @@ const OrganizerDashboard = () => {
                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                      <Plus className="w-6 h-6" />
                  </div>
-                 <div>
-                     <h3 className="font-bold text-lg text-text">Create New Event</h3>
-                     <p className="text-sm text-textSecondary">Schedule a meetup</p>
+                  <div>
+                     <h3 className="font-bold text-lg text-text">{BUTTON_TEXT.CREATE_EVENT}</h3>
+                     <p className="text-sm text-textSecondary">{UI_TEXT.CREATE_EVENT_SUBTITLE}</p>
                  </div>
              </div>
         </div>
@@ -63,19 +67,19 @@ const OrganizerDashboard = () => {
         {/* Event List */}
         <div className="lg:col-span-2 space-y-8">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-text">Your Events</h2>
+                <h2 className="text-2xl font-bold text-text">{UI_TEXT.SIDEBAR_MY_EVENTS}</h2>
             </div>
             
             {isLoading ? (
                 <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
             ) : events.length === 0 ? (
-                 <div className="p-12 bg-surface rounded-[2rem] border border-dashed border-gray-200 text-center">
+                  <div className="p-12 bg-surface rounded-[2rem] border border-dashed border-gray-200 text-center">
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Calendar className="w-8 h-8 text-gray-300" />
                     </div>
                     <h3 className="text-lg font-bold text-text mb-2">No events yet</h3>
-                    <p className="text-textSecondary mb-6">Create your first event to get started managing your community.</p>
-                    <Button onClick={() => navigate(ROUTES.CREATE_EVENT)}>Create Event</Button>
+                    <p className="text-textSecondary mb-6">{UI_TEXT.NO_EVENTS_FOUND_SUBTITLE}</p>
+                    <Button onClick={() => navigate(ROUTES.CREATE_EVENT)}>{BUTTON_TEXT.CREATE_EVENT}</Button>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -102,14 +106,14 @@ const OrganizerDashboard = () => {
                         onClick={() => navigate('/discover')}
                     >
                         <Globe className="w-4 h-4" />
-                        Go to Discover Page
+                        {UI_TEXT.NAV_DISCOVER}
                     </Button>
                 </div>
             </div>
 
             <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-lg text-text">My Communities</h3>
+                    <h3 className="font-bold text-lg text-text">{UI_TEXT.FOOTER_COMMUNITY}</h3>
                     <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => navigate('/communities/create')}>
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -131,8 +135,6 @@ const OrganizerDashboard = () => {
     </div>
   );
 };
-
-import type { ICommunity } from '../types/community.types';
 
 const MyCommunitiesList = () => {
     const [communities, setCommunities] = useState<ICommunity[]>([]);

@@ -4,7 +4,7 @@ import { Calendar, X } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { type IRsvp, RsvpStatus } from '../../types/rsvp.types';
 import { UI_TEXT } from '../../constants/text.constants';
-import Button from '../../components/Button';
+import Button from '../../components/common/Button';
 import { AttendeeEventItem } from '../dashboard/AttendeeEventItem';
 
 interface JoinedEventsListProps {

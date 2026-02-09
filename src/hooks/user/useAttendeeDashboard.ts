@@ -9,12 +9,25 @@ import { updateUser } from '../../store/authSlice';
 import { type IRsvp, RsvpStatus } from '../../types/rsvp.types';
 import { ERROR_MESSAGES } from '../../constants/text.constants';
 
-export const useAttendeeDashboard = () => {
+import type { IEvent } from '../../types/event.types';
+import type { ICommunity } from '../../types/community.types';
+
+interface AttendeeDashboardData {
+    events: IEvent[];
+    communities: ICommunity[];
+}
+
+export const useAttendeeDashboard = (_initialData?: AttendeeDashboardData) => {
     const { user } = useAuth();
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
     const [myRsvps, setMyRsvps] = useState<IRsvp[]>([]);
     const [loadingRsvps, setLoadingRsvps] = useState(true);
+
+    // Note: Dashboard loader fetches *suggested* events, not RSVPs. 
+    // We might want to add RSVPs to dashboard loader later.
+    // For now, we accept initialData to match the pattern, even if unused for RSVPs.
+    // actually, we can use events from initialData if relevant.
 
     const fetchRsvps = useCallback(async () => {
         try {

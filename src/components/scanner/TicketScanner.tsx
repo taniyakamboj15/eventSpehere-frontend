@@ -1,6 +1,6 @@
-import { useTicketScanner } from '../hooks/useTicketScanner';
+import { useTicketScanner } from '../../hooks/useTicketScanner';
 import { X } from 'lucide-react';
-import { UI_TEXT } from '../constants/text.constants';
+import { UI_TEXT } from '../../constants/text.constants';
 
 interface TicketScannerProps {
     eventId: string;
@@ -9,7 +9,7 @@ interface TicketScannerProps {
 }
 
 export const TicketScanner = ({ eventId, onClose, onScanSuccess }: TicketScannerProps) => {
-    // Custom hook handles all scanning logic
+   
     useTicketScanner({ eventId, onScanSuccess });
 
     return (

@@ -20,3 +20,14 @@ export interface IRsvp {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface GoingStateProps {
+    onCancel: () => void;
+    isLoading: boolean;
+}
+
+export interface JoinStateProps {
+    onJoin: () => void;
+    isLoading: boolean;
+    disabled?: boolean;
+}

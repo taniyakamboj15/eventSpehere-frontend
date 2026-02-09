@@ -1,35 +1,37 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calendar, CheckCircle } from 'lucide-react';
 import { UI_TEXT } from '../../constants/text.constants';
-import type { IEvent } from '../../types/event.types';
+import type { EventImageProps } from '../../types/event.types';
 
-interface EventImageProps {
-    event: IEvent;
-    isJoined: boolean;
-}
+const ImagePlaceholder = () => (
+    <div className="w-full h-full flex items-center justify-center text-textSecondary bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="text-center">
+            <Calendar className="w-8 h-8 mx-auto mb-2 opacity-20" />
+            <span className="text-xs font-medium uppercase tracking-wider opacity-50">{UI_TEXT.NO_IMAGE}</span>
+        </div>
+    </div>
+);
 
-const EventImage: React.FC<EventImageProps> = ({ event, isJoined }) => {
+const EventImage = ({ event, isJoined }: EventImageProps) => {
     const [imageError, setImageError] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    const hasImage = event.photos && event.photos.length > 0 && !imageError;
 
     return (
         <div className="relative h-52 overflow-hidden bg-gray-100">
-            {event.photos && event.photos.length > 0 && !imageError ? (
+            {hasImage ? (
                 <img 
-                    src={event.photos[0]} 
+                    src={event.photos![0]} 
                     alt={event.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setIsLoaded(true)}
                     onError={() => setImageError(true)}
                 />
-            ) : (
-                <div className="w-full h-full flex items-center justify-center text-textSecondary bg-gradient-to-br from-slate-50 to-slate-100">
-                    <div className="text-center">
-                        <Calendar className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                        <span className="text-xs font-medium uppercase tracking-wider opacity-50">{UI_TEXT.NO_IMAGE}</span>
-                    </div>
-                </div>
-            )}
+            ) : <ImagePlaceholder />}
             
-            {/* Overlay Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-2">
                 <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-primary shadow-sm uppercase tracking-wide border border-white/20">
                     {event.category}

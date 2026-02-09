@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { EventCategory } from '../types/event.types';
-import EventCard from '../components/EventCard';
+import EventCard from '../components/event-card/EventCard';
 import { Loader2, Search, Calendar, MapPin } from 'lucide-react';
 import CommunityList from '../features/community/CommunityList';
 import { useDiscoverEvents } from '../hooks/useDiscoverEvents';
 import { UI_TEXT } from '../constants/text.constants';
+import StatusHandler from '../components/common/StatusHandler';
+import EventCardSkeleton from '../components/event-card/EventCardSkeleton';
 
 const DiscoverPage = () => {
   const { 
@@ -18,6 +20,8 @@ const DiscoverPage = () => {
   } = useDiscoverEvents();
   
   const [activeTab, setActiveTab] = useState<'events' | 'communities'>('events');
+
+  const categories = useMemo(() => Object.values(EventCategory), []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +63,7 @@ const DiscoverPage = () => {
                              >
                                  {UI_TEXT.ALL_FILTER}
                              </button>
-                             {Object.values(EventCategory).map((category) => (
+                             {categories.map((category) => (
                                  <button
                                      key={category}
                                      onClick={() => setFilters(prev => ({ ...prev, category }))}
@@ -145,26 +149,29 @@ const DiscoverPage = () => {
                             </div>
                         </div>
 
-                        {isLoading ? (
-                            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-10 h-10" /></div>
-                        ) : error ? (
-                            <div className="text-center py-20 bg-red-50 rounded-3xl border border-red-100">
-                                <p className="text-red-600 font-bold text-lg mb-2">{UI_TEXT.OOPS_ERROR}</p>
-                                <p className="text-red-400">{error}</p>
-                            </div>
-                        ) : events.length === 0 ? (
-                            <div className="col-span-full py-20 text-center bg-gray-50 rounded-[3rem] border border-dashed border-gray-200">
-                                <Calendar className="w-16 h-16 mx-auto mb-6 text-gray-200" />
-                                <h3 className="text-2xl font-black text-text mb-2">{UI_TEXT.NO_EVENTS_FOUND_TITLE}</h3>
-                                <p className="text-textSecondary">{UI_TEXT.NO_EVENTS_FOUND_SUBTITLE}</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {events.map((event) => (
-                                    <EventCard key={event._id} event={event} />
-                                ))}
-                            </div>
-                        )}
+import EventCardSkeleton from '../components/event-card/EventCardSkeleton';
+
+                <StatusHandler 
+                    isLoading={isLoading && events.length === 0} 
+                    error={error} 
+                    isEmpty={events.length === 0 && !isLoading}
+                    emptyTitle={UI_TEXT.NO_EVENTS_FOUND_TITLE}
+                    emptyMessage={UI_TEXT.NO_EVENTS_FOUND_SUBTITLE}
+                    emptyIcon={<Calendar className="w-16 h-16 mx-auto mb-6 text-gray-200" />}
+                    loadingComponent={
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {[...Array(8)].map((_, i) => (
+                                <EventCardSkeleton key={i} />
+                            ))}
+                        </div>
+                    }
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 optimize-list">
+                        {events.map((event) => (
+                            <EventCard key={event._id} event={event} />
+                        ))}
+                    </div>
+                </StatusHandler>
                         
                         {isLoading && events.length > 0 && (
                             <div className="py-8 flex justify-center">

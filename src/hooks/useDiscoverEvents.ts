@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { eventApi, type GetEventsParams } from '../services/api/event.api';
 import { EventCategory, type IEvent } from '../types/event.types';
 import { toast } from 'react-hot-toast';
@@ -127,7 +127,7 @@ export const useDiscoverEvents = () => {
         toast.success('Location filter cleared');
     }, []);
 
-    return {
+    return useMemo(() => ({
         events,
         isLoading,
         error,
@@ -135,5 +135,5 @@ export const useDiscoverEvents = () => {
         setFilters,
         handleLocationClick,
         clearLocation
-    };
+    }), [events, isLoading, error, filters, handleLocationClick, clearLocation]);
 };
