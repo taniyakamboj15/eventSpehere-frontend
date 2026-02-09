@@ -1,16 +1,16 @@
-import type { FieldErrors } from 'react-hook-form';
+import type { FieldErrors, FieldValues, FieldError } from 'react-hook-form';
 
-export const getNestedError = (errors: FieldErrors<any>, path: string) => {
+export const getNestedError = (errors: FieldErrors<FieldValues>, path: string): FieldError | undefined => {
     const parts = path.split('.');
-    let current: any = errors;
+    let current: unknown = errors;
     
     for (const part of parts) {
-        if (current && typeof current === 'object' && part in current) {
-            current = current[part];
+        if (current && typeof current === 'object' && part in (current as Record<string, unknown>)) {
+            current = (current as Record<string, unknown>)[part];
         } else {
             return undefined;
         }
     }
     
-    return current;
+    return current as FieldError | undefined;
 };

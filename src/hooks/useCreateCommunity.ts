@@ -22,7 +22,7 @@ interface CreateCommunityForm {
 
 export const useCreateCommunity = () => {
     const { form, serverError, onSubmit } = useActionForm<CreateCommunityForm>(
-        schema as any,
+        schema,
         ROUTES.CREATE_COMMUNITY,
         {
             defaultValues: {

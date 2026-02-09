@@ -99,8 +99,10 @@ export const useCommunityDetails = (id: string | undefined, initialData?: Commun
                 if (!prev) return null;
                 return {
                     ...prev,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    members: prev.members.filter((m: any) => (m._id || m.id || m) !== memberId)
+                    members: prev.members.filter((m: unknown) => {
+                        const member = m as { _id?: string; id?: string };
+                        return (member._id || member.id || (m as string)) !== memberId;
+                    })
                 };
             });
         } catch (error: unknown) {

@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useForm, type UseFormProps, type FieldValues } from 'react-hook-form';
+import { useForm, type UseFormProps, type FieldValues, type Path } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useActionData, useSubmit } from 'react-router-dom';
 import type { AnyObjectSchema } from 'yup';
+
+interface ActionResponse {
+    success: boolean;
+    error?: string;
+    fieldErrors?: Record<string, string>;
+    [key: string]: unknown;
+}
 
 export const useActionForm = <T extends FieldValues>(
     schema: AnyObjectSchema,
     action: string,
     formOptions?: UseFormProps<T>
 ) => {
-    const actionData = useActionData() as any;
+    const actionData = useActionData() as ActionResponse | undefined;
     const submit = useSubmit();
     const [serverError, setServerError] = useState<string | null>(null);
 
@@ -22,7 +29,7 @@ export const useActionForm = <T extends FieldValues>(
         if (actionData?.success === false) {
             if (actionData.fieldErrors) {
                 Object.keys(actionData.fieldErrors).forEach((field) => {
-                    setError(field as any, {
+                    setError(field as Path<T>, {
                         type: 'server',
                         message: actionData.fieldErrors![field],
                     });
@@ -34,7 +41,7 @@ export const useActionForm = <T extends FieldValues>(
 
     const onSubmit = (data: T) => {
         setServerError(null);
-        submit(data as any, { method: "post", action });
+        submit(data as unknown as Record<string, string>, { method: "post", action });
     };
 
     return { form, ...form, setError, serverError, onSubmit, actionData };

@@ -6,6 +6,11 @@ import { type LoginDTO } from '../../services/api/auth.api';
 import { setCredentials } from '../../store/authSlice';
 import { ROUTES } from '../../constants/routes';
 import { useActionForm } from '../utils/useActionForm';
+import type { AuthResponse } from '../../types/auth.types';
+
+interface LoginActionResponse extends AuthResponse {
+    success: boolean;
+}
 
 export const useLogin = () => {
     const dispatch = useDispatch();
@@ -18,15 +23,17 @@ export const useLogin = () => {
         ROUTES.LOGIN
     );
 
+    const loginData = actionData as unknown as LoginActionResponse | undefined;
+
     useEffect(() => {
-        if (actionData?.success && actionData.user) {
+        if (loginData?.success && loginData.user) {
             dispatch(setCredentials({ 
-                user: actionData.user, 
-                accessToken: actionData.accessToken || '' 
+                user: loginData.user, 
+                accessToken: loginData.accessToken || '' 
             }));
             navigate(redirectTo || ROUTES.DASHBOARD);
         }
-    }, [actionData, dispatch, navigate, redirectTo]);
+    }, [loginData, dispatch, navigate, redirectTo]);
 
     return { form, serverError, onSubmit };
 };

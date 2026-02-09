@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useForm, useWatch, type FieldError, type Resolver } from 'react-hook-form';
+import { useForm, useWatch, type FieldError, type Resolver, type FieldPath } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSubmit, useActionData, useNavigate } from 'react-router-dom';
 import { getNestedError } from '../../utils/form.utils';
@@ -94,7 +94,7 @@ export const useEventForm = ({ initialData, isEditing = false, initialCommunityI
         } else if (actionData?.success === false) {
             if (actionData.fieldErrors) {
                 Object.keys(actionData.fieldErrors).forEach((field) => {
-                    form.setError(field as any, {
+                    form.setError(field as FieldPath<EventFormData>, {
                         type: 'server',
                         message: actionData.fieldErrors![field],
                     });

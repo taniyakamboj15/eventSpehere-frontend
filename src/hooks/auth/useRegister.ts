@@ -4,6 +4,7 @@ import { registerSchema } from '../../validators/auth.schema';
 import { type RegisterDTO } from '../../services/api/auth.api';
 import { ROUTES } from '../../constants/routes';
 import { useActionForm } from '../utils/useActionForm';
+import type { RegisterActionResponse } from '../../types/auth.types';
 
 export const useRegister = () => {
     const navigate = useNavigate();
@@ -13,11 +14,13 @@ export const useRegister = () => {
         ROUTES.REGISTER
     );
 
+    const registerData = actionData as unknown as RegisterActionResponse | undefined;
+
     useEffect(() => {
-        if (actionData?.success && actionData.email) {
-            navigate(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(actionData.email)}`);
+        if (registerData?.success && registerData.email) {
+            navigate(`${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(registerData.email)}`);
         }
-    }, [actionData, navigate]);
+    }, [registerData, navigate]);
 
     return { form, serverError, onSubmit };
 };

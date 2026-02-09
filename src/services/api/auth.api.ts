@@ -1,9 +1,6 @@
 import api from './axios';
 import type { AuthResponse } from '../../types/auth.types';
 import type { ApiResponse } from '../../types/api.types';
-// Actually yup schema types are inferred. I should define input types in types/auth.types.ts or infer them.
-// For now, I'll use any or implicit types if permitted, but "No any allowed".
-// I'll update auth.types.ts with DTOs later or now.
 
 import * as Yup from 'yup';
 import { loginSchema, registerSchema } from '../../validators/auth.schema';
@@ -39,8 +36,6 @@ export const authApi = {
 
   getCurrentUser: async () => {
      // If backend supports /auth/me or verify token
-     // Actually frontend checks state or uses refresh.
-     // Let's assume we can fetch profile if needed.
-     // For now, return nothing or check simple ping.
+     // Auth API implementation
   }
 };

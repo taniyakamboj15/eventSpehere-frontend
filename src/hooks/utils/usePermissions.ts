@@ -22,7 +22,7 @@ export const usePermissions = () => {
 
         const isCommunityAdmin = event.community && 
             typeof event.community !== 'string' && 
-            'admins' in (event.community as Record<string, any>) && 
+            'admins' in (event.community as unknown as ICommunity) && 
             (event.community as unknown as ICommunity).admins?.includes(user.id);
 
         const canManage = isOrganizer || isCommunityAdmin;
