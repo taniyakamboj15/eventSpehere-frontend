@@ -3,9 +3,16 @@ import type { InternalAxiosRequestConfig } from 'axios';
 import { APP_CONFIG } from '../../constants/app.config';
 import { store } from '../../store/store';
 import { logout, setCredentials } from '../../store/authSlice';
+import toast from 'react-hot-toast';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
+}
+
+interface ApiErrorResponse {
+  success: false;
+  message: string;
+  errors?: string[];
 }
 
 const api = axios.create({
@@ -14,6 +21,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30 second timeout
 });
 
 
@@ -32,8 +40,20 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
+  async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
+    
+    // Handle network errors
+    if (!error.response) {
+      toast.error('Network error. Please check your internet connection.');
+      return Promise.reject(new Error('Network error'));
+    }
+
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED') {
+      toast.error('Request timeout. Please try again.');
+      return Promise.reject(error);
+    }
     
     // Check if error is 401 and not a retry and not a login request
     if (originalRequest && error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/login')) {
@@ -51,11 +71,22 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Refresh failed - logout
         store.dispatch(logout());
+        toast.error('Session expired. Please login again.');
         return Promise.reject(refreshError);
       }
     }
+
+    // Handle other HTTP errors
+    const message = error.response?.data?.message || 'An error occurred';
+    
+    // Don't show toast for 401 errors (handled above)
+    if (error.response?.status !== 401) {
+      toast.error(message);
+    }
+
     return Promise.reject(error);
   }
 );
 
 export default api;
+

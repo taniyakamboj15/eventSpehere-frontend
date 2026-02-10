@@ -13,6 +13,8 @@ A modern, type-safe React application for managing community events, RSVPs, and 
 - **Maps**: [React Leaflet](https://react-leaflet.js.org/)
 - **QR Codes**: [html5-qrcode](https://github.com/mebjas/html5-qrcode) & [react-qr-code](https://www.npmjs.com/package/react-qr-code)
 - **HTTP Client**: [Axios](https://axios-http.com/)
+- **Notifications**: [React Hot Toast](https://react-hot-toast.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
 ## ✨ Key Features
 
@@ -60,6 +62,12 @@ A modern, type-safe React application for managing community events, RSVPs, and 
     ```
     The app will be available at `http://localhost:5173` (or the port shown in terminal).
 
+5.  **Build for production**:
+    ```bash
+    npm run build
+    ```
+    Optimized production build will be in the `dist/` folder.
+
 ## 📂 Project Structure
 
 ```
@@ -84,8 +92,54 @@ This project uses ESLint with strict type-aware rules.
 npm run lint
 ```
 
+## ⚡ Production Optimizations
+
+### Environment Configuration
+- Type-safe environment validation
+- Separate `.env.development` and `.env.production` files
+- Runtime validation with error messages
+
+### Error Handling
+- **Error Boundaries**: Production-grade error boundaries catch component errors
+- **API Error Handling**: Enhanced Axios interceptors with:
+  - Network error detection and user feedback
+  - Timeout handling (30s)
+  - Automatic token refresh on 401
+  - Toast notifications for errors
+
+### Build Optimizations
+- **Code Splitting**: Optimized vendor chunks
+  - `vendor-react`: React core libraries
+  - `vendor-redux`: State management
+  - `vendor-ui`: UI components (Lucide, Toast)
+  - `vendor-maps`: Mapping libraries
+  - `vendor-utils`: Utilities (Axios, date-fns)
+- **Minification**: Terser with console.log removal in production
+- **Cache Optimization**: Hash-based file naming for better caching
+- **Bundle Analysis**: Optimized chunk sizes (1000KB warning limit)
+
+### Performance Features
+- Lazy loading for route components
+- Optimized Redux store configuration
+- Dependency pre-optimization
+- Source maps disabled in production
+
 ## 📝 Recent Updates
 
+### Production Optimizations (Latest)
+- **Critical Priority (5/5 Complete)**:
+  - Environment configuration with validation
+  - Production-grade error boundaries
+  - Enhanced API error handling with auto-retry
+  - Type-safe configuration across the app
+  
+- **High Priority (4/6 Complete)**:
+  - Enhanced Vite build configuration
+  - Code splitting with loading fallbacks
+  - Optimized state management
+  - Bundle analysis and optimization
+
+### Previous Updates
 - **Architectural Cleanup**: Refactored components to separate business logic, UI styles, and type definitions.
 - **Centralized Type Management**: Consolidated all component interfaces into `src/types` to ensure project-wide consistency and reusability.
 - **Logic Refactoring**: Replaced complex ternary operators and conditional logic with efficient lookup maps for UI states and component styles.
